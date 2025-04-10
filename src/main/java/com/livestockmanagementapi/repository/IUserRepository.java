@@ -1,4 +1,4 @@
 package com.livestockmanagementapi.repository;
 
-public class UserRepository {
+public interface IUserRepository {
 }

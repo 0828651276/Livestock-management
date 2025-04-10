@@ -1,4 +1,4 @@
 package com.livestockmanagementapi.config;
 
-public class CorsConfig {
+public class SecurityInitializer {
 }
