@@ -1,4 +1,4 @@
-package com.livestockmanagementapi.service;
+package com.livestockmanagementapi.service.animal;
 
 import com.livestockmanagementapi.model.Animal;
 import com.livestockmanagementapi.repository.AnimalRepository;
@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class AnimalService implements com.livestockmanagementapi.service.IAnimalService {
+public class AnimalService implements IAnimalService {
 
     @Autowired
     private AnimalRepository animalRepository;

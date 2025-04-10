@@ -1,4 +1,4 @@
-package com.livestockmanagementapi.service;
+package com.livestockmanagementapi.service.animal;
 
 import com.livestockmanagementapi.model.Animal;
 

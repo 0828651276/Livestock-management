@@ -11,6 +11,7 @@ public class PigPen {//Chuồng nuôi
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long penId;
+    private String name;
 
     @ManyToOne
     @JoinColumn(name = "employee_id")

@@ -1,7 +1,7 @@
 package com.livestockmanagementapi.controller;
 
 import com.livestockmanagementapi.model.Animal;
-import com.livestockmanagementapi.service.IAnimalService;
+import com.livestockmanagementapi.service.animal.IAnimalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
