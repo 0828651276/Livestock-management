@@ -2,43 +2,74 @@ package com.livestockmanagementapi.controller;
 
 import com.livestockmanagementapi.model.Employee;
 import com.livestockmanagementapi.service.employee.EmployeeService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/employee")
-@CrossOrigin("*")
+@RequestMapping("/api/employees")
+@RequiredArgsConstructor
 public class EmployeeController {
 
-    @Autowired
-    private EmployeeService employeeService;
+    private final EmployeeService employeeService;
 
+    // Lấy danh sách tất cả nhân viên
     @GetMapping
-    public ResponseEntity<?> getAllEmployees() {
-        List<Employee> employees = employeeService.findAll();
-        return new ResponseEntity<>(employees, HttpStatus.OK);
+    public ResponseEntity<List<Employee>> getAllEmployees() {
+        return ResponseEntity.ok(employeeService.findAll());
     }
 
-    @PostMapping("")
-    public ResponseEntity<?> createEmployee(@RequestBody Employee employee) {
+    // Tìm nhân viên theo ID hoặc Tên
+    @GetMapping("/search")
+    public ResponseEntity<List<Employee>> search(
+            @RequestParam(required = false) String id,
+            @RequestParam(required = false) String name
+    ) {
+        List<Employee> result = employeeService.search(id, name);
+        return ResponseEntity.ok(result);
+    }
+
+    // Thêm hoặc cập nhật nhân viên
+    @PostMapping
+    public ResponseEntity<Employee> saveEmployee(@RequestBody Employee employee) {
         employeeService.save(employee);
-        return new ResponseEntity<>(employee, HttpStatus.CREATED);
+        return ResponseEntity.ok(employee);
     }
 
+    // Cập nhật nhân viên
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateEmployee(@RequestBody Employee employee) {
+    public ResponseEntity<Employee> updateEmployee(@PathVariable String id, @RequestBody Employee updatedEmployee) {
+        Optional<Employee> existing = employeeService.findByIdString(id);
+
+        if (existing.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Employee employee = existing.get();
+        employee.setFullName(updatedEmployee.getFullName());
+        employee.setUsername(updatedEmployee.getUsername());
+        employee.setPassword(updatedEmployee.getPassword());
+        employee.setEmail(updatedEmployee.getEmail());
+        employee.setBirthDate(updatedEmployee.getBirthDate());
+        employee.setGender(updatedEmployee.getGender());
+        employee.setIdCardNumber(updatedEmployee.getIdCardNumber());
+        employee.setRole(updatedEmployee.getRole());
+
         employeeService.save(employee);
-        return new ResponseEntity<>(employee, HttpStatus.OK);
+        return ResponseEntity.ok(employee);
     }
 
+    // Xoá nhân viên
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteEmployee(@PathVariable Long id) {
-        employeeService.deleteById(id);
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<Void> deleteEmployee(@PathVariable String id) {
+        Optional<Employee> employee = employeeService.findByIdString(id);
+        if (employee.isPresent()) {
+            employeeService.deleteByIdString(id);
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
     }
-
 }

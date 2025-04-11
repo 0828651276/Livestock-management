@@ -4,10 +4,10 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.math.BigDecimal;
-@Data
-@Entity
-@Table(name= "feed_batch")
 
+@Entity
+@Data
+@Table(name= "feed_batch")
 public class FeedBatch {//Quản lý thức ăn (đàn)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

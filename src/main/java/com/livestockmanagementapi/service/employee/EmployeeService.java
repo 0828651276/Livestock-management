@@ -4,6 +4,7 @@ import com.livestockmanagementapi.model.Employee;
 import com.livestockmanagementapi.repository.EmployeeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,6 +15,8 @@ public class EmployeeService implements IEmployeeService{
 
     @Autowired
     private final EmployeeRepository employeeRepository;
+    private final PasswordEncoder passwordEncoder;
+
 
 
     @Override
@@ -29,6 +32,10 @@ public class EmployeeService implements IEmployeeService{
 
     @Override
     public void save(Employee employee) {
+        // Nếu là tạo mới hoặc password bị thay đổi → băm password
+        if (employee.getPassword() != null && !employee.getPassword().startsWith("$2a$")) {
+            employee.setPassword(passwordEncoder.encode(employee.getPassword()));
+        }
         employeeRepository.save(employee);
     }
 
@@ -37,9 +44,26 @@ public class EmployeeService implements IEmployeeService{
 
     }
 
-    public String generateEmployeeId() {
-        long count = employeeRepository.count(); // Đếm số lượng hiện tại
-        return String.format("EMP%03d", count + 1); // Ví dụ: EMP001
+    @Override
+    public Optional<Employee> findByIdString(String id) {
+        return employeeRepository.findById(id);
+    }
+
+    @Override
+    public void deleteByIdString(String id) {
+        employeeRepository.deleteById(id);
+    }
+
+    public List<Employee> search(String id, String name) {
+        if (id != null && name != null) {
+            return employeeRepository.findByEmployeeIdContainingIgnoreCaseAndFullNameContainingIgnoreCase(id, name);
+        } else if (id != null) {
+            return employeeRepository.findByEmployeeIdContainingIgnoreCase(id);
+        } else if (name != null) {
+            return employeeRepository.findByFullNameContainingIgnoreCase(name);
+        } else {
+            return employeeRepository.findAll();
+        }
     }
 
 
