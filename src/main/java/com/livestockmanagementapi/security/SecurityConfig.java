@@ -25,16 +25,28 @@ public class SecurityConfig {
         this.jwtFilter = jwtFilter;
     }
 
+//    @Bean
+//    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+//        return http
+//                .csrf(csrf -> csrf.disable())
+//                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+//                .authorizeHttpRequests(auth -> auth
+//                        .requestMatchers("/api/login").permitAll()
+//                        .requestMatchers("/admin/**").hasRole("MANAGER")
+//                        .requestMatchers("/staff/**").hasAnyRole("MANAGER", "STAFF")
+//                        .anyRequest().authenticated()
+//                )
+//                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+//                .build();
+//    }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
-                .csrf(csrf -> csrf.disable()) // Cách mới: dùng lambda để disable CSRF
+                .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/login").permitAll()
-                        .requestMatchers("/admin/**").hasRole("MANAGER")
-                        .requestMatchers("/staff/**").hasAnyRole("MANAGER", "STAFF")
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll() // Cho phép tất cả request
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
