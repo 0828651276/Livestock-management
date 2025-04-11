@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Entity
 @Table(name = "employee")
@@ -33,6 +34,17 @@ public class Employee { //Nhân viên
 
     public enum Role {
         MANAGER, STAFF
+    }
+
+    @PrePersist
+    public void generateId() {
+        if (this.employeeId == null || this.employeeId.isEmpty()) {
+            this.employeeId = "NV" + UUID.randomUUID().toString().substring(0, 3).toUpperCase();
+        }
+
+        if (this.role == null) {
+            this.role = Role.STAFF;
+        }
     }
 }
 
