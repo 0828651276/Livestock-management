@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @Entity
 public class Animal {//Cá thể (con lợn)
     @Id
-    private String pigId;
+    private Long pigId;
 
     @ManyToOne
     @JoinColumn(name = "pen_id")
