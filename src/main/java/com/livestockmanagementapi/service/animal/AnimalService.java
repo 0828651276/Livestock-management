@@ -14,40 +14,25 @@ public class AnimalService implements IAnimalService {
     @Autowired
     private AnimalRepository animalRepository;
 
+
     @Override
-    public List<Animal> getAllAnimals() {
+    public List findAll() {
         return animalRepository.findAll();
     }
 
     @Override
-    public Optional<Animal> getAnimalById(String pigId) {
-        return animalRepository.findById(pigId);
+    public Optional<Animal> findById(Long id) {
+        return animalRepository.findById(id);
+    }
+
+
+    @Override
+    public void deleteById(Long id) {
+
     }
 
     @Override
-    public List<Animal> searchByStatus(String status) {
-        return animalRepository.findByStatusContainingIgnoreCase(status);
-    }
-
-    @Override
-    public Animal addAnimal(Animal animal) {
-        return animalRepository.save(animal);
-    }
-
-    @Override
-    public Animal updateAnimal(String pigId, Animal updatedAnimal) {
-        return animalRepository.findById(pigId).map(animal -> {
-            animal.setPigPen(updatedAnimal.getPigPen());
-            animal.setEntryDate(updatedAnimal.getEntryDate());
-            animal.setExitDate(updatedAnimal.getExitDate());
-            animal.setStatus(updatedAnimal.getStatus());
-            animal.setWeight(updatedAnimal.getWeight());
-            return animalRepository.save(animal);
-        }).orElseThrow(() -> new RuntimeException("Không tìm thấy Animal với pigId: " + pigId));
-    }
-
-    @Override
-    public void deleteAnimal(String pigId) {
-        animalRepository.deleteById(pigId);
+    public void save(Animal animal) {
+        animalRepository.save(animal);
     }
 }
