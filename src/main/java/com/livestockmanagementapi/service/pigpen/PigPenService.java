@@ -14,7 +14,6 @@ public class PigPenService implements IPigPenService {
     @Autowired
     private PigPenRepository pigPenRepository;
 
-
     @Override
     public List<PigPen> findAll() {
         return pigPenRepository.findAll();
@@ -22,7 +21,7 @@ public class PigPenService implements IPigPenService {
 
     @Override
     public Optional<PigPen> findById(Long id) {
-        return Optional.empty();
+        return pigPenRepository.findById(id);
     }
 
     @Override
@@ -32,6 +31,6 @@ public class PigPenService implements IPigPenService {
 
     @Override
     public void deleteById(Long id) {
-
+        pigPenRepository.deleteById(id);
     }
 }
