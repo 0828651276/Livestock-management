@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Entity
 @Table(name = "employee")
@@ -14,10 +15,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class Employee { //Nhân viên
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-
-    private String employeeId; // Now as a business identifier, not the primary key
+    private String employeeId;
 
     private String fullName;
 
@@ -37,4 +35,16 @@ public class Employee { //Nhân viên
     public enum Role {
         MANAGER, STAFF
     }
+
+    @PrePersist
+    public void generateId() {
+        if (this.employeeId == null || this.employeeId.isEmpty()) {
+            this.employeeId = "NV" + UUID.randomUUID().toString().substring(0, 3).toUpperCase();
+        }
+
+        if (this.role == null) {
+            this.role = Role.STAFF;
+        }
+    }
 }
+
