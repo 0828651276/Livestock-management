@@ -5,8 +5,8 @@ import lombok.Data;
 
 import java.time.LocalDate;
 
-@Entity
 @Data
+@Entity
 @Table(name= "medical_treatment")
 public class MedicalTreatment {//Khám chữa trị
     @Id

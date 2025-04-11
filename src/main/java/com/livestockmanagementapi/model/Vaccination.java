@@ -6,7 +6,6 @@ import lombok.Data;
 import java.time.LocalDate;
 
 @Entity
-@Data
 @Table(name= "vaccination")
 public class Vaccination {//Tiêm phòng
     @Id
