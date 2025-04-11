@@ -1,27 +1,22 @@
 package com.livestockmanagementapi.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
 @Entity
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Table(name= "pig_pen")
 public class PigPen {//Chuồng nuôi
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-
-    private String penId; // Now as a business identifier, not the primary key
+    private Long penId;
 
     @ManyToOne
     @JoinColumn(name = "employee_id")
     private Employee caretaker;
-
+    private String name;
     private LocalDate createdDate;
     private LocalDate closedDate;
     private int quantity;
