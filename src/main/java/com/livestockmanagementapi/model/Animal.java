@@ -1,17 +1,23 @@
 package com.livestockmanagementapi.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Animal {//Cá thể (con lợn)
     @Id
-    private String pigId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    private String pigId; // Now as a business identifier, not the primary key
 
     @ManyToOne
     @JoinColumn(name = "pen_id")
@@ -22,4 +28,3 @@ public class Animal {//Cá thể (con lợn)
     private String status;
     private BigDecimal weight;
 }
-

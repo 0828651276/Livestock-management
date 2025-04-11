@@ -1,16 +1,22 @@
 package com.livestockmanagementapi.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
 @Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class PigPen {//Chuồng nuôi
     @Id
-    private String penId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    private String penId; // Now as a business identifier, not the primary key
 
     @ManyToOne
     @JoinColumn(name = "employee_id")
@@ -20,4 +26,3 @@ public class PigPen {//Chuồng nuôi
     private LocalDate closedDate;
     private int quantity;
 }
-
