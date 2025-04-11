@@ -14,7 +14,10 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class Employee { //Nhân viên
     @Id
-    private String employeeId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    private String employeeId; // Now as a business identifier, not the primary key
 
     private String fullName;
 
@@ -35,4 +38,3 @@ public class Employee { //Nhân viên
         MANAGER, STAFF
     }
 }
-

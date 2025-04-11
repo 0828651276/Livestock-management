@@ -3,11 +3,13 @@ package com.livestockmanagementapi.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.time.LocalDate;
+import lombok.Data;
 
-@Entity
+import java.time.LocalDate;
 @Data
+@Entity
 @Table(name= "notification")
+
 public class Notification { //Thông báo
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

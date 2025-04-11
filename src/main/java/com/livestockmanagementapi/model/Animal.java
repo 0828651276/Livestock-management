@@ -1,6 +1,7 @@
 package com.livestockmanagementapi.model;
 
 import jakarta.persistence.*;
+
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -23,4 +24,3 @@ public class Animal {//Cá thể (con lợn)
     private String status;
     private BigDecimal weight;
 }
-

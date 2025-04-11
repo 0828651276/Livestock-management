@@ -9,6 +9,7 @@ import java.time.LocalDate;
 @Entity
 @Data
 @Table(name= "export_record")
+
 public class ExportRecord {//Xuất chuồng
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

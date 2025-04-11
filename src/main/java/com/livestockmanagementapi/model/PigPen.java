@@ -21,4 +21,3 @@ public class PigPen {//Chuồng nuôi
     private LocalDate closedDate;
     private int quantity;
 }
-
