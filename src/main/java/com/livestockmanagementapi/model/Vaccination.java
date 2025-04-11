@@ -9,10 +9,6 @@ import lombok.Data;
 
 import java.time.LocalDate;
 @Data
-
-
-import java.time.LocalDate;
-
 @Entity
 public class Vaccination {//Tiêm phòng
     @Id
