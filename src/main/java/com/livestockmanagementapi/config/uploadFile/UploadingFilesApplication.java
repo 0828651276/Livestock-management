@@ -1,6 +1,6 @@
-package c09.workflow_management_api.configuration.uploadFile;
+package com.livestockmanagementapi.config.uploadFile;
 
-import c09.workflow_management_api.service.uploadFile.StorageService;
+import com.livestockmanagementapi.service.uploadFile.StorageService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

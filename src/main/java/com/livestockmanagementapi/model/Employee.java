@@ -29,6 +29,8 @@ public class Employee { //Nhân viên
     private String gender;
     private String idCardNumber;
 
+    private String imagePath = "";
+
     @Enumerated(EnumType.STRING)
     private Role role;
 

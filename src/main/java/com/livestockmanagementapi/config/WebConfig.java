@@ -1,4 +1,4 @@
-package c09.workflow_management_api.configuration;
+package com.livestockmanagementapi.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;

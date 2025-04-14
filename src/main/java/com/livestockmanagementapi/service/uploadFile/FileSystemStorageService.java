@@ -1,4 +1,4 @@
-package c09.workflow_management_api.service.uploadFile;
+package com.livestockmanagementapi.service.uploadFile;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,7 +17,7 @@ public class FileSystemStorageService implements StorageService {
     private final Path rootLocation;
 
     public FileSystemStorageService() {
-        this.rootLocation = Paths.get("src/main/java/c09/workflow_management_api/images");
+        this.rootLocation = Paths.get("src/main/java/com/livestockmanagementapi/images");
     }
 
     @Override
@@ -49,7 +49,7 @@ public class FileSystemStorageService implements StorageService {
 
     @Override
     public String storeWithUUID(MultipartFile file) {
-        String filename = UUID.randomUUID() + "_" + Path.of(file.getOriginalFilename()).getFileName().toString();
+        String filename = Path.of(file.getOriginalFilename()).getFileName().toString();
         Path destinationFile = this.rootLocation.resolve(filename).normalize().toAbsolutePath();
 
         if (!destinationFile.startsWith(rootLocation.toAbsolutePath())) {
