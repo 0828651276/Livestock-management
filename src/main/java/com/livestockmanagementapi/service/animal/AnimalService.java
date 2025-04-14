@@ -28,8 +28,9 @@ public class AnimalService implements IAnimalService {
 
     @Override
     public void deleteById(Long id) {
-
+        animalRepository.deleteById(id);
     }
+
 
     @Override
     public void save(Animal animal) {

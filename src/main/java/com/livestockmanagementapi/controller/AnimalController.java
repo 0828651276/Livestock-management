@@ -18,7 +18,7 @@ public class AnimalController {
     private IAnimalService animalService;
 
     @GetMapping
-    public List<Animal> getAllAnimals() {
+    public List<Animal> findAll() {
         return animalService.findAll();
     }
 
@@ -34,11 +34,18 @@ public class AnimalController {
         animalService.save(animal);
         return ResponseEntity.ok(animal);
     }
-//
-//    @PutMapping("/{id}")
-//    public Animal updateAnimal(@PathVariable String id, @RequestBody Animal animal) {
-//
-//    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Animal> updateAnimal(@PathVariable Long id, @RequestBody Animal updatedAnimal) {
+        Optional<Animal> existing = animalService.findById(id);
+        if (existing.isPresent()) {
+            updatedAnimal.setPigId(id);
+            animalService.save(updatedAnimal);
+            return ResponseEntity.ok(updatedAnimal);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAnimal(@PathVariable Long id){
@@ -51,4 +58,3 @@ public class AnimalController {
         return ResponseEntity.noContent().build();
     }
 }
-

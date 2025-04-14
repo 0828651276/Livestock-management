@@ -5,6 +5,6 @@ import com.livestockmanagementapi.service.IGenericService;
 
 
 public interface IPigPenService extends IGenericService<PigPen> {
-
+    void save(PigPen pigPen);
 }
 
