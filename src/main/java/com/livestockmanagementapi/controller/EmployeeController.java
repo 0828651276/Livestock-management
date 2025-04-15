@@ -1,11 +1,15 @@
 package com.livestockmanagementapi.controller;
 
 import com.livestockmanagementapi.model.Employee;
+import com.livestockmanagementapi.service.email.EmailService;
 import com.livestockmanagementapi.service.employee.EmployeeService;
 import com.livestockmanagementapi.service.uploadFile.StorageService;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,6 +26,12 @@ public class EmployeeController {
 
     private final EmployeeService employeeService;
     private final StorageService storageService;
+    @Autowired
+    private EmailService emailService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
 
     // Lấy danh sách tất cả nhân viên
     @GetMapping
@@ -51,23 +61,34 @@ public class EmployeeController {
         return ResponseEntity.ok(result);
     }
 
-    // Thêm hoặc cập nhật nhân viên
+    // Thêm nhân viên mới
     @PostMapping("/")
     public ResponseEntity<Employee> saveEmployeeWithImage(
             @RequestPart("employee") Employee employee,
             @RequestPart(value = "avatar", required = false) MultipartFile avatar
-    ) {
+    ) throws MessagingException {
         // Mật khẩu mặc định
         String defaultPassword = "123456";
-        employee.setPassword(defaultPassword);
+        employee.setPassword(passwordEncoder.encode(defaultPassword));
 
         if (avatar != null && !avatar.isEmpty()) {
             String fileName = storageService.storeWithUUID(avatar);
             employee.setImagePath(fileName);
         }
+
         employeeService.save(employee);
+
+        // Sau khi lưu thành công, gửi email thông báo
+        emailService.sendAccountInfoEmail(
+                employee.getEmail(),
+                employee.getUsername(), // hoặc employee.getEmail()
+                defaultPassword,
+                employee.getFullName()
+        );
+
         return ResponseEntity.status(HttpStatus.CREATED).body(employee);
     }
+
 
     // Cập nhật nhân viên
     @PutMapping("/{employeeId}")
@@ -122,6 +143,38 @@ public class EmployeeController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+
+    @PostMapping("/{employeeId}/change-password")
+    public ResponseEntity<?> changePassword(
+            @PathVariable String employeeId,
+            @RequestParam String oldPassword,
+            @RequestParam String newPassword
+    ) {
+        Optional<Employee> employeeOpt = employeeService.findByIdString(employeeId);
+
+        if (employeeOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nhân viên không tồn tại");
+        }
+
+        Employee employee = employeeOpt.get();
+
+        // Kiểm tra mật khẩu cũ
+        if (!passwordEncoder.matches(oldPassword, employee.getPassword())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Mật khẩu cũ không đúng");
+        }
+
+        // Cập nhật mật khẩu mới
+        employee.setPassword(passwordEncoder.encode(newPassword));
+        employeeService.save(employee);
+
+        try {
+            emailService.sendPasswordChangedNotification(employee.getEmail());
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+        
+        return ResponseEntity.ok("Đổi mật khẩu thành công");
     }
 
 }
