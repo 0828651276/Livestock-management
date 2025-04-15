@@ -29,6 +29,18 @@ public class EmployeeController {
         return ResponseEntity.ok(employeeService.findAll());
     }
 
+    // Lấy thông tin chi tiết của nhân viên theo ID
+    @GetMapping("/{employeeId}")
+    public ResponseEntity<Employee> getEmployeeById(@PathVariable String employeeId) {
+        Optional<Employee> employee = employeeService.findByIdString(employeeId);
+        if (employee.isPresent()) {
+            return ResponseEntity.ok(employee.get());
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
+
+
     // Tìm nhân viên theo ID hoặc Tên
     @GetMapping("/search")
     public ResponseEntity<List<Employee>> search(
