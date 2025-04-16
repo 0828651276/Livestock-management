@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface AnimalRepository extends JpaRepository<Animal, Long> {
+public interface   AnimalRepository extends JpaRepository<Animal, Long> {
     List<Animal> findByStatusContainingIgnoreCase(String status); // ví dụ tìm kiếm theo status
 }
 
