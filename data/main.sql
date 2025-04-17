@@ -1,0 +1,3 @@
+drop database livestock_management;
+create database livestock_management;
+use livestock_management;
