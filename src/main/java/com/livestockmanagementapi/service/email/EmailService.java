@@ -17,7 +17,7 @@ public class EmailService {
     public void sendAccountInfoEmail(String to, String username, String password, String fullName) throws MessagingException {
         String subject = "Thông tin tài khoản truy cập hệ thống";
 
-        String loginUrl = "http://localhost:5173/";
+        String loginUrl = "http://localhost:5173/login";
 
         String htmlContent = "<p>Chào <b>" + fullName + "</b>,</p>"
                 + "<p>Tài khoản truy cập của bạn như sau:</p>"

@@ -1,6 +1,8 @@
 package com.livestockmanagementapi.controller;
 
 import com.livestockmanagementapi.model.Employee;
+import com.livestockmanagementapi.model.PigPen;
+import com.livestockmanagementapi.repository.PigPenRepository;
 import com.livestockmanagementapi.service.email.EmailService;
 import com.livestockmanagementapi.service.employee.EmployeeService;
 import com.livestockmanagementapi.service.uploadFile.StorageService;
@@ -13,7 +15,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -26,11 +27,9 @@ public class EmployeeController {
 
     private final EmployeeService employeeService;
     private final StorageService storageService;
-    @Autowired
-    private EmailService emailService;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
+    private final PasswordEncoder passwordEncoder;
+    private final PigPenRepository pigPenRepository;
 
 
     // Lấy danh sách tất cả nhân viên
@@ -127,23 +126,25 @@ public class EmployeeController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteEmployee(@PathVariable String id) {
-        Optional<Employee> employee = employeeService.findByIdString(id);
-        if (employee.isPresent()) {
-            // Xoá file ảnh nếu tồn tại
-            String avatarPath = employee.get().getImagePath(); // đường dẫn đến file ảnh
-            if (avatarPath != null) {
-                File avatarFile = new File(avatarPath);
-                if (avatarFile.exists()) {
-                    avatarFile.delete();
-                }
-            }
+        Optional<Employee> employeeOpt = employeeService.findByIdString(id);
+        if (employeeOpt.isPresent()) {
+            Employee employee = employeeOpt.get();
 
-            // Xoá nhân viên khỏi CSDL
+            // 1. Gỡ các pig pen do nhân viên này chăm sóc
+            List<PigPen> pigPens = pigPenRepository.findByCaretakerEmployeeId(id);
+            for (PigPen pen : pigPens) {
+                pen.setCaretaker(null);
+            }
+            pigPenRepository.saveAll(pigPens);
+
+            // 2. Xoá nhân viên
             employeeService.deleteByIdString(id);
+
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
+
 
     @PostMapping("/{employeeId}/change-password")
     public ResponseEntity<?> changePassword(
