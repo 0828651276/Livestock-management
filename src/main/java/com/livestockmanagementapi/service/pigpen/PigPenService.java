@@ -6,8 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -96,23 +95,23 @@ public class PigPenService implements IPigPenService {
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public List<PigPen> findByCaretakerId(String caretakerId) {
-        if (caretakerId == null) {
-            return List.of();
-        }
-
-        // Tìm trong cả caretaker và caretakers
-        List<PigPen> byCaretaker = pigPenRepository.findByCaretakerEmployeeId(caretakerId);
-        List<PigPen> byAnyCaretaker = pigPenRepository.findByAnyCaretakerEmployeeId(caretakerId);
-
-        // Kết hợp kết quả và loại bỏ trùng lặp
-        return byCaretaker.stream()
-                .filter(pen -> !byAnyCaretaker.contains(pen))
-                .collect(Collectors.toList())
-                .stream()
-                .collect(Collectors.toList());
-    }
+//    @Override
+//    public List<PigPen> findByCaretakerId(String caretakerId) {
+//        if (caretakerId == null) {
+//            return List.of();
+//        }
+//
+//        // Tìm trong cả caretaker và caretakers
+//        List<PigPen> byCaretaker = pigPenRepository.findByCaretakerEmployeeId(caretakerId);
+//        List<PigPen> byAnyCaretaker = pigPenRepository.findByAnyCaretakerEmployeeId(caretakerId);
+//
+//        // Kết hợp kết quả và loại bỏ trùng lặp
+//        return byCaretaker.stream()
+//                .filter(pen -> !byAnyCaretaker.contains(pen))
+//                .collect(Collectors.toList())
+//                .stream()
+//                .collect(Collectors.toList());
+//    }
 
     @Override
     public List<PigPen> searchByQuantityRange(Integer min, Integer max) {
@@ -121,4 +120,21 @@ public class PigPenService implements IPigPenService {
                 .filter(pen -> max == null || pen.getQuantity() <= max)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<PigPen> findByEmployeeId(String employeeId) {
+        if (employeeId == null) return List.of();
+
+        List<PigPen> pensByCaretaker = pigPenRepository.findByCaretakerEmployeeId(employeeId);
+        List<PigPen> pensByAnyCaretaker = pigPenRepository.findByAnyCaretakerEmployeeId(employeeId);
+
+        // Gộp 2 danh sách vào một Set để tự động loại trùng
+        Set<PigPen> uniquePens = new HashSet<>();
+        uniquePens.addAll(pensByCaretaker);
+        uniquePens.addAll(pensByAnyCaretaker);
+
+        return new ArrayList<>(uniquePens);
+    }
+
+
 }
