@@ -2,9 +2,9 @@ package com.livestockmanagementapi.controller;
 
 import com.livestockmanagementapi.model.dto.AuthRequest;
 import com.livestockmanagementapi.model.dto.AuthResponse;
+import com.livestockmanagementapi.model.Employee;
 import com.livestockmanagementapi.repository.EmployeeRepository;
 import com.livestockmanagementapi.security.JwtUtil;
-import com.livestockmanagementapi.service.employee.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -36,16 +36,15 @@ public class AuthController {
 
             String token = jwtUtil.generateToken(request.getUsername());
 
-            // ✅ Tìm employeeId từ username
-            String employeeId = employeeRepository
+            // Tìm employee từ username để lấy employeeId và role
+            Employee employee = employeeRepository
                     .findByUsername(request.getUsername())
-                    .map(emp -> emp.getEmployeeId())
-                    .orElse(null);
+                    .orElseThrow(() -> new RuntimeException("Employee not found"));
 
-            return new AuthResponse(token, employeeId);
+            // Trả về token, employeeId và role
+            return new AuthResponse(token, employee.getEmployeeId(), employee.getRole().toString());
         } catch (AuthenticationException e) {
             throw new RuntimeException("Invalid username or password");
         }
     }
-
 }

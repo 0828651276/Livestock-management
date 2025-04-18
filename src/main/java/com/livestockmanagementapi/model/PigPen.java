@@ -17,7 +17,7 @@ public class PigPen {
 
     @ManyToOne
     @JoinColumn(name = "employee_id")
-    private Employee caretaker; // Giữ lại để đảm bảo tính tương thích ngược
+    private Employee caretaker;
 
     @ManyToMany
     @JoinTable(
@@ -32,7 +32,9 @@ public class PigPen {
     private LocalDate closedDate;
     private int quantity;
 
-    // Các helper methods để quản lý caretakers
+    @Enumerated(EnumType.STRING)
+    private com.livestockmanagementapi.model.type.PenStatus status;
+
     public void addCaretaker(Employee employee) {
         this.caretakers.add(employee);
     }
