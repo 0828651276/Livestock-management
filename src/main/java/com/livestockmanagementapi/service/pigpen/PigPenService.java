@@ -51,9 +51,11 @@ public class PigPenService implements IPigPenService {
         return allPigPens.stream()
                 .filter(pen -> name == null ||
                         (pen.getName() != null && pen.getName().toLowerCase().contains(name.toLowerCase())))
+                // Tìm kiếm trong tất cả caretakers
                 .filter(pen -> caretakerName == null ||
-                        (pen.getCaretaker() != null && pen.getCaretaker().getFullName() != null &&
-                                pen.getCaretaker().getFullName().toLowerCase().contains(caretakerName.toLowerCase())))
+                        (pen.getCaretakers() != null && pen.getCaretakers().stream()
+                                .anyMatch(caretaker -> caretaker.getFullName() != null &&
+                                        caretaker.getFullName().toLowerCase().contains(caretakerName.toLowerCase()))))
                 .filter(pen -> createdDateFrom == null ||
                         (pen.getCreatedDate() != null &&
                                 !pen.getCreatedDate().isBefore(createdDateFrom)))
@@ -71,12 +73,7 @@ public class PigPenService implements IPigPenService {
             return findAll();
         }
 
-        String searchTerm = name.toLowerCase().trim();
-
-        return findAll().stream()
-                .filter(pen -> pen.getName() != null &&
-                        pen.getName().toLowerCase().contains(searchTerm))
-                .collect(Collectors.toList());
+        return pigPenRepository.findByNameContainingIgnoreCase(name.trim());
     }
 
     @Override
@@ -100,14 +97,20 @@ public class PigPenService implements IPigPenService {
     }
 
     @Override
-    public List<PigPen> findByCaretakerId(Long caretakerId) {
+    public List<PigPen> findByCaretakerId(String caretakerId) {
         if (caretakerId == null) {
             return List.of();
         }
 
-        return findAll().stream()
-                .filter(pen -> pen.getCaretaker() != null &&
-                        caretakerId.equals(pen.getCaretaker().getEmployeeId()))
+        // Tìm trong cả caretaker và caretakers
+        List<PigPen> byCaretaker = pigPenRepository.findByCaretakerEmployeeId(caretakerId);
+        List<PigPen> byAnyCaretaker = pigPenRepository.findByAnyCaretakerEmployeeId(caretakerId);
+
+        // Kết hợp kết quả và loại bỏ trùng lặp
+        return byCaretaker.stream()
+                .filter(pen -> !byAnyCaretaker.contains(pen))
+                .collect(Collectors.toList())
+                .stream()
                 .collect(Collectors.toList());
     }
 

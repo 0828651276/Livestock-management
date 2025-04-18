@@ -15,8 +15,8 @@ public interface IPigPenService extends IGenericService<PigPen> {
 
     List<PigPen> searchByDateRange(LocalDate from, LocalDate to);
 
-    List<PigPen> findByCaretakerId(Long caretakerId);
+    // Thay đổi kiểu dữ liệu từ Long thành String để khớp với employeeId
+    List<PigPen> findByCaretakerId(String caretakerId);
 
     List<PigPen> searchByQuantityRange(Integer min, Integer max);
 }
-
