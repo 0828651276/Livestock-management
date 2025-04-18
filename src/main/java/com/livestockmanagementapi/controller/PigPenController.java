@@ -67,19 +67,6 @@ public class PigPenController {
      * - Nếu có caretakers nhưng không có caretaker, đặt caretaker là người đầu tiên trong caretakers
      */
     private void handleCaretakers(PigPen pigPen) {
-        // Nếu có caretaker đơn lẻ nhưng không có trong caretakers, thêm vào
-        if (pigPen.getCaretaker() != null) {
-            if (pigPen.getCaretakers() == null) {
-                pigPen.setCaretakers(new HashSet<>());
-            }
-            pigPen.getCaretakers().add(pigPen.getCaretaker());
-        }
-
-        // Nếu có caretakers nhưng không có caretaker, đặt caretaker là người đầu tiên
-        if (pigPen.getCaretakers() != null && !pigPen.getCaretakers().isEmpty() && pigPen.getCaretaker() == null) {
-            pigPen.setCaretaker(pigPen.getCaretakers().iterator().next());
-        }
-
         // Xử lý trường hợp nhận ID thay vì object đầy đủ
         if (pigPen.getCaretakers() != null) {
             Set<Employee> resolvedCaretakers = pigPen.getCaretakers().stream()
@@ -92,6 +79,16 @@ public class PigPenController {
                     .collect(Collectors.toSet());
 
             pigPen.setCaretakers(resolvedCaretakers);
+        }
+
+        // Nếu có caretaker đơn lẻ nhưng không có trong caretakers, thêm vào
+        if (pigPen.getCaretaker() != null && !pigPen.getCaretakers().contains(pigPen.getCaretaker())) {
+            pigPen.getCaretakers().add(pigPen.getCaretaker());
+        }
+
+        // Nếu có caretakers nhưng không có caretaker, đặt caretaker là người đầu tiên
+        if (pigPen.getCaretakers() != null && !pigPen.getCaretakers().isEmpty() && pigPen.getCaretaker() == null) {
+            pigPen.setCaretaker(pigPen.getCaretakers().iterator().next());
         }
     }
 
