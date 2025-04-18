@@ -15,7 +15,7 @@ public class FeedWarehouse {//Kho thức ăn
     private Long id;
 
     private String feedType;
-    private BigDecimal quantity;
+    private Long quantity;
     private String unit;
     private LocalDate date;
 
@@ -25,5 +25,13 @@ public class FeedWarehouse {//Kho thức ăn
     public enum TransactionType {
         IMPORT, EXPORT
     }
+
+    @ManyToOne
+    @JoinColumn(name = "feed_batch_id")
+    private FeedBatch feedBatch;
+
+    @ManyToOne
+    @JoinColumn(name = "pen_id")
+    private PigPen pigPen;
 }
 
