@@ -150,10 +150,10 @@ public class PigPenController {
     /**
      * Search for pig pens by caretaker id
      */
-    @GetMapping("/search/caretaker/{caretakerId}")
-    public List<PigPen> searchPigPensByCaretaker(@PathVariable String caretakerId) {
-        return pigPenService.findByCaretakerId(caretakerId);
-    }
+//    @GetMapping("/search/caretaker/{caretakerId}")
+//    public List<PigPen> searchPigPensByCaretaker(@PathVariable String caretakerId) {
+//        return pigPenService.findByCaretakerId(caretakerId);
+//    }
 
     /**
      * Search for pig pens by quantity range
@@ -165,4 +165,10 @@ public class PigPenController {
 
         return pigPenService.searchByQuantityRange(min, max);
     }
+
+    @GetMapping("/my-pens")
+    public List<PigPen> getMyPigPens(@RequestParam String employeeId) {
+        return pigPenService.findByEmployeeId(employeeId);
+    }
+
 }
