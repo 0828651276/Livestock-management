@@ -35,6 +35,7 @@ public class FeedWarehouseController {
         }
     }
 
+//    them moi thuc an
     @PostMapping("")
     public FeedWarehouse addFeedWarehouse(@RequestBody FeedWarehouse feedWarehouse) {
         feedWarehouseService.save(feedWarehouse);
