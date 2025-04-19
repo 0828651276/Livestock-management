@@ -1,9 +1,8 @@
 package com.livestockmanagementapi.model.dto.feedWarehouse;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public class FeedImportRequest {
+public class FeedRequest {
     private String feedType;
     private Long quantity;
     private String unit;
@@ -11,7 +10,7 @@ public class FeedImportRequest {
     private Long feedBatchId;
     private Long pigPenId;
 
-    public FeedImportRequest(String feedType, Long quantity, String unit, LocalDate date, Long feedBatchId, Long pigPenId) {
+    public FeedRequest(String feedType, Long quantity, String unit, LocalDate date, Long feedBatchId, Long pigPenId) {
         this.feedType = feedType;
         this.quantity = quantity;
         this.unit = unit;
