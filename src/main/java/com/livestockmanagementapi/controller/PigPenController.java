@@ -6,6 +6,7 @@ import com.livestockmanagementapi.repository.EmployeeRepository;
 import com.livestockmanagementapi.service.pigpen.IPigPenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -58,6 +59,63 @@ public class PigPenController {
             return ResponseEntity.ok(updatedPigPen);
         } else {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    /**
+     * API để nhân viên thoát khỏi chuồng họ đang chăm sóc
+     */
+    @DeleteMapping("/{penId}/caretakers/{employeeId}")
+    public ResponseEntity<?> removeCaretakerFromPen(
+            @PathVariable Long penId,
+            @PathVariable String employeeId) {
+        try {
+            // Kiểm tra chuồng có tồn tại không
+            Optional<PigPen> pigPenOpt = pigPenService.findById(penId);
+            if (pigPenOpt.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("Không tìm thấy chuồng với ID: " + penId);
+            }
+
+            // Kiểm tra nhân viên có tồn tại không
+            Optional<Employee> employeeOpt = employeeRepository.findById(employeeId);
+            if (employeeOpt.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("Không tìm thấy nhân viên với ID: " + employeeId);
+            }
+
+            PigPen pigPen = pigPenOpt.get();
+            Employee employee = employeeOpt.get();
+
+            // Kiểm tra xem nhân viên có phải là người chăm sóc của chuồng này không
+            if (pigPen.getCaretakers() == null || !pigPen.getCaretakers().contains(employee)) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("Nhân viên không phải là người chăm sóc của chuồng này");
+            }
+
+            // Xóa nhân viên khỏi danh sách caretakers
+            pigPen.getCaretakers().remove(employee);
+
+            // Nếu nhân viên cũng là caretaker chính (primary), cần thay thế
+            if (pigPen.getCaretaker() != null && pigPen.getCaretaker().getEmployeeId().equals(employeeId)) {
+                // Nếu còn nhân viên khác trong danh sách, chọn người đầu tiên làm caretaker chính
+                if (!pigPen.getCaretakers().isEmpty()) {
+                    pigPen.setCaretaker(pigPen.getCaretakers().iterator().next());
+                } else {
+                    // Nếu không còn ai, đặt null
+                    pigPen.setCaretaker(null);
+                }
+            }
+
+            // Lưu chuồng đã cập nhật
+            pigPenService.save(pigPen);
+
+            return ResponseEntity.ok()
+                    .body("Đã xóa nhân viên khỏi chuồng thành công");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Lỗi khi xóa nhân viên khỏi chuồng: " + e.getMessage());
         }
     }
 

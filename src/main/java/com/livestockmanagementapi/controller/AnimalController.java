@@ -14,8 +14,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/animals")
@@ -75,6 +74,7 @@ public class AnimalController {
             animalService.save(animal);
             return ResponseEntity.ok(animal);
         } catch (Exception e) {
+            e.printStackTrace(); // In chi tiết lỗi vào log
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
@@ -95,6 +95,8 @@ public class AnimalController {
 
             // Cập nhật thông tin animal
             Animal animal = existing.get();
+            Long originalPenId = animal.getPigPen() != null ? animal.getPigPen().getPenId() : null;
+
             animal.setName(request.getName());
             animal.setEntryDate(request.getEntryDate());
             animal.setExitDate(request.getExitDate());
@@ -102,11 +104,15 @@ public class AnimalController {
             animal.setWeight(request.getWeight());
 
             // Nếu thay đổi pigPen, cập nhật số lượng
-            if (!animal.getPigPen().getPenId().equals(request.getPenId())) {
+            if (originalPenId == null || !originalPenId.equals(request.getPenId())) {
                 // Giảm số lượng ở pen cũ
-                PigPen oldPen = animal.getPigPen();
-                oldPen.setQuantity(oldPen.getQuantity() - 1);
-                pigPenService.save(oldPen);
+                if (originalPenId != null) {
+                    PigPen oldPen = animal.getPigPen();
+                    if (oldPen != null && oldPen.getQuantity() > 0) {
+                        oldPen.setQuantity(oldPen.getQuantity() - 1);
+                        pigPenService.save(oldPen);
+                    }
+                }
 
                 // Tăng số lượng ở pen mới
                 PigPen newPen = pigPen.get();
@@ -119,7 +125,8 @@ public class AnimalController {
             animalService.save(animal);
             return ResponseEntity.ok(animal);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+            e.printStackTrace(); // In chi tiết lỗi vào log
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi khi cập nhật: " + e.getMessage());
         }
     }
 
@@ -135,13 +142,16 @@ public class AnimalController {
             Animal animalToDelete = animal.get();
             if (animalToDelete.getPigPen() != null) {
                 PigPen pen = animalToDelete.getPigPen();
-                pen.setQuantity(pen.getQuantity() - 1);
-                pigPenService.save(pen);
+                if (pen.getQuantity() > 0) {
+                    pen.setQuantity(pen.getQuantity() - 1);
+                    pigPenService.save(pen);
+                }
             }
 
             animalService.deleteById(id);
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
+            e.printStackTrace(); // In chi tiết lỗi vào log
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
@@ -156,6 +166,7 @@ public class AnimalController {
         try {
             return ResponseEntity.ok(animalService.search(name, status, entryDateFrom, entryDateTo, penId));
         } catch (Exception e) {
+            e.printStackTrace(); // In chi tiết lỗi vào log
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
@@ -165,6 +176,7 @@ public class AnimalController {
         try {
             return ResponseEntity.ok(animalService.findByPenId(penId));
         } catch (Exception e) {
+            e.printStackTrace(); // In chi tiết lỗi vào log
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
@@ -174,7 +186,34 @@ public class AnimalController {
         try {
             return ResponseEntity.ok(animalService.findByStatus(status));
         } catch (Exception e) {
+            e.printStackTrace(); // In chi tiết lỗi vào log
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/employee/{employeeId}")
+    public ResponseEntity<?> getAnimalsByEmployeeId(@PathVariable String employeeId) {
+        try {
+            // Lấy danh sách chuồng do nhân viên chăm sóc
+            List<PigPen> employeePens = pigPenService.findByEmployeeId(employeeId);
+
+            if (employeePens.isEmpty()) {
+                return ResponseEntity.ok(new ArrayList<>());
+            }
+
+            // Lấy động vật từ các chuồng và loại bỏ trùng lặp
+            Set<Animal> uniqueAnimals = new HashSet<>();
+            for (PigPen pen : employeePens) {
+                List<Animal> penAnimals = animalService.findByPenId(pen.getPenId());
+                uniqueAnimals.addAll(penAnimals);
+            }
+
+            return ResponseEntity.ok(new ArrayList<>(uniqueAnimals));
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 }
+
+
+
