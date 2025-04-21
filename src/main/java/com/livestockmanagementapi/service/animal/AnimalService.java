@@ -67,5 +67,9 @@ public class AnimalService implements IAnimalService {
         return animalRepository.findByStatusContainingIgnoreCase(status);
     }
 
-
+    @Override
+    public List<Animal> findExportedAnimals() {
+        // Use the repository method to find animals with exactly "EXPORTED" status
+        return animalRepository.findByStatusEquals("EXPORTED");
+    }
 }

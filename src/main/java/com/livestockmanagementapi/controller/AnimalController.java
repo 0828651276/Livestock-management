@@ -98,13 +98,13 @@ public class AnimalController {
             // Cập nhật thông tin animal
             Animal animal = existing.get();
             Long originalPenId = animal.getPigPen() != null ? animal.getPigPen().getPenId() : null;
+            Integer originalQuantity = animal.getQuantity() != null ? animal.getQuantity() : 0;
 
             animal.setName(request.getName());
             animal.setEntryDate(request.getEntryDate());
             animal.setExitDate(request.getExitDate());
             animal.setStatus(request.getStatus());
             animal.setWeight(request.getWeight());
-            animal.setQuantity(request.getQuantity());
 
             // Nếu thay đổi chuồng nuôi, cập nhật số lượng ở cả hai chuồng
             if (!request.getPenId().equals(originalPenId)) {
@@ -113,7 +113,7 @@ public class AnimalController {
                     Optional<PigPen> oldPen = pigPenService.findById(originalPenId);
                     if (oldPen.isPresent()) {
                         PigPen oldPigPen = oldPen.get();
-                        oldPigPen.setQuantity(oldPigPen.getQuantity() - animal.getQuantity());
+                        oldPigPen.setQuantity(oldPigPen.getQuantity() - originalQuantity);
                         pigPenService.save(oldPigPen);
                     }
                 }
@@ -124,6 +124,21 @@ public class AnimalController {
                 pigPenService.save(newPen);
                 animal.setPigPen(newPen);
             }
+            // Nếu vẫn ở cùng một chuồng nhưng số lượng đã thay đổi
+            else if (!request.getQuantity().equals(originalQuantity)) {
+                PigPen currentPen = pigPen.get();
+                int quantityDifference = request.getQuantity() - originalQuantity;
+                currentPen.setQuantity(currentPen.getQuantity() + quantityDifference);
+                pigPenService.save(currentPen);
+                animal.setPigPen(currentPen);
+            }
+            else {
+                // Giữ nguyên chuồng và không thay đổi số lượng
+                animal.setPigPen(pigPen.get());
+            }
+
+            // Cập nhật số lượng của animal sau khi đã xử lý logic chuồng
+            animal.setQuantity(request.getQuantity());
 
             animalService.save(animal);
             return ResponseEntity.ok(animal);
@@ -146,7 +161,9 @@ public class AnimalController {
             if (animalToDelete.getPigPen() != null) {
                 PigPen pen = animalToDelete.getPigPen();
                 if (pen.getQuantity() > 0) {
-                    pen.setQuantity(pen.getQuantity() - 1);
+                    // Giảm số lượng theo số lượng cá thể thực tế
+                    int quantity = animalToDelete.getQuantity() != null ? animalToDelete.getQuantity() : 1;
+                    pen.setQuantity(pen.getQuantity() - quantity);
                     pigPenService.save(pen);
                 }
             }
@@ -191,6 +208,23 @@ public class AnimalController {
         } catch (Exception e) {
             e.printStackTrace(); // In chi tiết lỗi vào log
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    /**
+     * Get all animals with EXPORTED status
+     * @return List of animals that have been exported
+     */
+    @GetMapping("/exported")
+    public ResponseEntity<?> getExportedAnimals() {
+        try {
+            // Use the existing findByStatus method with "EXPORTED" status
+            List<Animal> exportedAnimals = animalService.findByStatus("EXPORTED");
+            return ResponseEntity.ok(exportedAnimals);
+        } catch (Exception e) {
+            e.printStackTrace(); // Log error details
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error retrieving exported animals: " + e.getMessage());
         }
     }
 

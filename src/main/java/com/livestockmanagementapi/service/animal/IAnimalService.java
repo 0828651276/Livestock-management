@@ -15,4 +15,6 @@ public interface IAnimalService extends IGenericService<Animal> {
 
     List<Animal> findByStatus(String status);
 
+    // Add a new method specifically for exported animals
+    List<Animal> findExportedAnimals();
 }
