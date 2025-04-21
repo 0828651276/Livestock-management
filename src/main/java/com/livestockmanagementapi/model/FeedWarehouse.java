@@ -26,10 +26,6 @@ public class FeedWarehouse {//Kho thức ăn
     }
 
     @ManyToOne
-    @JoinColumn(name = "feed_batch_id")
-    private FeedBatch feedBatch;
-
-    @ManyToOne
     @JoinColumn(name = "pen_id")
     private PigPen pigPen;
 }

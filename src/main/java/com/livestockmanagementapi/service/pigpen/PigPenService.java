@@ -1,6 +1,8 @@
 package com.livestockmanagementapi.service.pigpen;
 
+import com.livestockmanagementapi.model.Animal;
 import com.livestockmanagementapi.model.PigPen;
+import com.livestockmanagementapi.repository.AnimalRepository;
 import com.livestockmanagementapi.repository.PigPenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,9 @@ public class PigPenService implements IPigPenService {
 
     @Autowired
     private PigPenRepository pigPenRepository;
+
+    @Autowired
+    private AnimalRepository animalRepository;
 
     @Override
     public List<PigPen> findAll() {
@@ -136,5 +141,31 @@ public class PigPenService implements IPigPenService {
         return new ArrayList<>(uniquePens);
     }
 
+    @Override
+    public List<PigPen> findEmptyPens() {
+        try {
+            // Get all pig pens
+            List<PigPen> allPens = findAll();
+
+            // Fetch and collect all pens that have animals
+            List<PigPen> pensWithAnimals = new ArrayList<>();
+            for (PigPen pen : allPens) {
+                // Attempt to find animals for this pen
+                List<Animal> animalsInPen = animalRepository.findByPigPenPenId(pen.getPenId());
+                // If there are animals, add to list
+                if (animalsInPen != null && !animalsInPen.isEmpty()) {
+                    pensWithAnimals.add(pen);
+                }
+            }
+
+            // Filter out pens that have animals, only keep ACTIVE pens
+            return allPens.stream()
+                    .filter(pen -> !pensWithAnimals.contains(pen))
+                    .filter(pen -> pen.getStatus() == com.livestockmanagementapi.model.type.PenStatus.ACTIVE)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new RuntimeException("Error finding empty pens", e);
+        }
+    }
 
 }

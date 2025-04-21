@@ -12,13 +12,13 @@ import java.util.List;
 public interface FeedPlanRepository extends JpaRepository<FeedPlan, Long> {
 
     @Query("SELECT new com.livestockmanagementapi.model.dto.FeedPlan.DailyFeedSummaryDTO(" +
-            "p.penId, p.name, f.feedType, SUM(f.dailyFood), f.unit) " +
+            "p.penId, p.name, f.feedType, SUM(f.dailyFood)) " +
             "FROM FeedPlan f JOIN f.pigPen p " +
             "WHERE :today BETWEEN f.startDate AND f.endDate " +
             "GROUP BY p.penId, p.name, f.feedType, f.unit")
     List<DailyFeedSummaryDTO> getDailyFeedSummary(@Param("today") LocalDate today);
 
-    @Query("SELECT f FROM FeedPlan f WHERE f.feedBatch.herdCode = :herdCode")
-    List<FeedPlan> findByHerdCode(@Param("herdCode") String herdCode);
+//    @Query("SELECT f FROM FeedPlan f WHERE f.feedBatch.herdCode = :herdCode")
+//    List<FeedPlan> findByHerdCode(@Param("herdCode") String herdCode);
 
 }

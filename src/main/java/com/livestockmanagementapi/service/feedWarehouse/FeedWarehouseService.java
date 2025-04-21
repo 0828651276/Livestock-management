@@ -1,11 +1,9 @@
 package com.livestockmanagementapi.service.feedWarehouse;
 
-import com.livestockmanagementapi.model.FeedBatch;
 import com.livestockmanagementapi.model.FeedWarehouse;
 import com.livestockmanagementapi.model.PigPen;
 import com.livestockmanagementapi.model.dto.feedWarehouse.FeedRequest;
 import com.livestockmanagementapi.model.dto.feedWarehouse.FeedInventoryDTO;
-import com.livestockmanagementapi.repository.FeedBatchRepository;
 import com.livestockmanagementapi.repository.FeedWarehouseRepository;
 import com.livestockmanagementapi.repository.PigPenRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +17,6 @@ import java.util.Optional;
 public class FeedWarehouseService implements IFeedWarehouseService {
 
     private final FeedWarehouseRepository feedWarehouseRepository;
-    private final FeedBatchRepository feedBatchRepository;
     private final PigPenRepository pigPenRepository;
 
     @Override
@@ -42,10 +39,10 @@ public class FeedWarehouseService implements IFeedWarehouseService {
         feedWarehouseRepository.deleteById(id);
     }
 
+
     public List<FeedInventoryDTO> getCurrentFeedInventory() {
         return feedWarehouseRepository.getFeedInventorySummary();
     }
-
 
     // nhap thuc an
     public void importFeed(FeedRequest request) {
@@ -62,15 +59,8 @@ public class FeedWarehouseService implements IFeedWarehouseService {
         FeedWarehouse warehouse = new FeedWarehouse();
         warehouse.setFeedType(request.getFeedType());
         warehouse.setQuantity(request.getQuantity());
-        warehouse.setUnit(request.getUnit());
         warehouse.setDate(request.getDate());
         warehouse.setTransactionType(type);
-
-        if (request.getFeedBatchId() != null) {
-            FeedBatch batch = feedBatchRepository.findById(request.getFeedBatchId())
-                    .orElseThrow(() -> new RuntimeException("Feed batch not found"));
-            warehouse.setFeedBatch(batch);
-        }
 
         if (request.getPigPenId() != null) {
             PigPen pen = pigPenRepository.findById(request.getPigPenId())

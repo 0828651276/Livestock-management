@@ -38,9 +38,9 @@ public class FeedFlanController {
         return ResponseEntity.ok(summaries);
     }
 
-    @GetMapping("/by-herd")
-    public ResponseEntity<List<FeedPlan>> getPlansByHerdCode(@RequestParam String herdCode) {
-        return ResponseEntity.ok(feedPlanService.getPlansByHerdCode(herdCode));
-    }
+//    @GetMapping("/by-herd")
+//    public ResponseEntity<List<FeedPlan>> getPlansByHerdCode(@RequestParam String herdCode) {
+//        return ResponseEntity.ok(feedPlanService.getPlansByHerdCode(herdCode));
+//    }
 
 }

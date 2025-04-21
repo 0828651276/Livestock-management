@@ -21,10 +21,6 @@ public class FeedPlan {
     private LocalDate endDate;
 
     @ManyToOne
-    @JoinColumn(name = "feed_batch_id")
-    private FeedBatch feedBatch;
-
-    @ManyToOne
     @JoinColumn(name = "pen_id")
     private PigPen pigPen;
 }
