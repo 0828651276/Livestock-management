@@ -20,7 +20,7 @@ public class AnimalRequest {
     private LocalDate exitDate;
 
     @NotBlank(message = "Trạng thái không được để trống")
-    @Pattern(regexp = "^(ACTIVE|SOLD|DEAD|TRANSFERRED)$", message = "Trạng thái không hợp lệ")
+    @Pattern(regexp = "^(ACTIVE|SICK|UNVACCINATED)$", message = "Trạng thái không hợp lệ")
     private String status;
 
     @NotNull(message = "Cân nặng không được để trống")
@@ -30,4 +30,9 @@ public class AnimalRequest {
 
     @NotNull(message = "Chuồng nuôi không được để trống")
     private Long penId;
-} 
+
+    @NotNull(message = "Số lượng không được để trống")
+    @Min(value = 1, message = "Số lượng phải lớn hơn hoặc bằng 1")
+    @Max(value = 1000, message = "Số lượng không được vượt quá 1000")
+    private Integer quantity;
+}

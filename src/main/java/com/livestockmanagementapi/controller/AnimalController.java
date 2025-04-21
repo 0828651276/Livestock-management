@@ -65,10 +65,11 @@ public class AnimalController {
             animal.setStatus(request.getStatus());
             animal.setWeight(request.getWeight());
             animal.setPigPen(pigPen.get());
+            animal.setQuantity(request.getQuantity());
 
             // Cập nhật số lượng trong pigPen
             PigPen pen = pigPen.get();
-            pen.setQuantity(pen.getQuantity() + 1);
+            pen.setQuantity(pen.getQuantity() + request.getQuantity());
             pigPenService.save(pen);
 
             animalService.save(animal);
@@ -102,23 +103,24 @@ public class AnimalController {
             animal.setExitDate(request.getExitDate());
             animal.setStatus(request.getStatus());
             animal.setWeight(request.getWeight());
+            animal.setQuantity(request.getQuantity());
 
-            // Nếu thay đổi pigPen, cập nhật số lượng
-            if (originalPenId == null || !originalPenId.equals(request.getPenId())) {
-                // Giảm số lượng ở pen cũ
+            // Nếu thay đổi chuồng nuôi, cập nhật số lượng ở cả hai chuồng
+            if (!request.getPenId().equals(originalPenId)) {
+                // Giảm số lượng ở chuồng cũ
                 if (originalPenId != null) {
-                    PigPen oldPen = animal.getPigPen();
-                    if (oldPen != null && oldPen.getQuantity() > 0) {
-                        oldPen.setQuantity(oldPen.getQuantity() - 1);
-                        pigPenService.save(oldPen);
+                    Optional<PigPen> oldPen = pigPenService.findById(originalPenId);
+                    if (oldPen.isPresent()) {
+                        PigPen oldPigPen = oldPen.get();
+                        oldPigPen.setQuantity(oldPigPen.getQuantity() - animal.getQuantity());
+                        pigPenService.save(oldPigPen);
                     }
                 }
 
-                // Tăng số lượng ở pen mới
+                // Tăng số lượng ở chuồng mới
                 PigPen newPen = pigPen.get();
-                newPen.setQuantity(newPen.getQuantity() + 1);
+                newPen.setQuantity(newPen.getQuantity() + request.getQuantity());
                 pigPenService.save(newPen);
-
                 animal.setPigPen(newPen);
             }
 
