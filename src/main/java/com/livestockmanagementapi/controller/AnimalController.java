@@ -215,6 +215,19 @@ public class AnimalController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
+
+    @GetMapping("/empty")
+    public ResponseEntity<List<PigPen>> getEmptyPens() {
+        try {
+            List<PigPen> emptyPens = pigPenService.findEmptyPens();
+            return ResponseEntity.ok(emptyPens);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(null);
+        }
+    }
+
 }
 
 
