@@ -28,6 +28,7 @@ public class AnimalController {
     @Autowired
     private IPigPenService pigPenService;
 
+
     @GetMapping
     public ResponseEntity<List<Animal>> findAll() {
         try {
@@ -228,7 +229,47 @@ public class AnimalController {
         }
     }
 
+    /**
+     * Xuất chuồng cá thể vật nuôi
+     * - Cập nhật trạng thái thành EXPORTED
+     * - Đặt ngày xuất thành ngày hiện tại
+     * - Giảm số lượng trong chuồng
+     */
+    @PostMapping("/{id}/export")
+    public ResponseEntity<?> exportAnimal(@PathVariable Long id) {
+        try {
+            Optional<Animal> existing = animalService.findById(id);
+            if (existing.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+
+            Animal animal = existing.get();
+
+            // Đặt trạng thái là đã xuất
+            animal.setStatus("EXPORTED");
+
+            // Đặt ngày xuất là ngày hiện tại
+            animal.setExitDate(LocalDate.now());
+
+            // Cập nhật số lượng trong chuồng
+            if (animal.getPigPen() != null) {
+                PigPen pen = animal.getPigPen();
+                // Giảm số lượng chuồng theo số lượng cá thể
+                int quantity = animal.getQuantity() != null ? animal.getQuantity() : 1;
+                if (pen.getQuantity() >= quantity) {
+                    pen.setQuantity(pen.getQuantity() - quantity);
+                    pigPenService.save(pen);
+                }
+            }
+
+            // Lưu cá thể đã cập nhật
+            animalService.save(animal);
+
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            e.printStackTrace(); // Ghi log lỗi chi tiết
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Lỗi khi xuất chuồng: " + e.getMessage());
+        }
+    }
 }
-
-
-

@@ -1,6 +1,7 @@
 package com.livestockmanagementapi.service.animal;
 
 import com.livestockmanagementapi.model.Animal;
+import com.livestockmanagementapi.model.PigPen;
 import com.livestockmanagementapi.repository.AnimalRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -65,4 +66,6 @@ public class AnimalService implements IAnimalService {
     public List<Animal> findByStatus(String status) {
         return animalRepository.findByStatusContainingIgnoreCase(status);
     }
+
+
 }
