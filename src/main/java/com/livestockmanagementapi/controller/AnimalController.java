@@ -52,10 +52,14 @@ public class AnimalController {
     @PostMapping
     public ResponseEntity<?> addAnimal(@Valid @RequestBody AnimalRequest request) {
         try {
-            // Kiểm tra pigPen tồn tại
-            Optional<PigPen> pigPen = pigPenService.findById(request.getPenId());
-            if (pigPen.isEmpty()) {
-                return ResponseEntity.badRequest().body("Chuồng nuôi không tồn tại");
+            // Nếu status là EXPORTED thì không kiểm tra chuồng
+            PigPen pen = null;
+            if (!"EXPORTED".equalsIgnoreCase(request.getStatus())) {
+                Optional<PigPen> pigPen = pigPenService.findById(request.getPenId());
+                if (pigPen.isEmpty()) {
+                    return ResponseEntity.badRequest().body("Chuồng nuôi không tồn tại");
+                }
+                pen = pigPen.get();
             }
 
             // Tạo đối tượng Animal từ request
@@ -65,13 +69,14 @@ public class AnimalController {
             animal.setExitDate(request.getExitDate());
             animal.setStatus(request.getStatus());
             animal.setWeight(request.getWeight());
-            animal.setPigPen(pigPen.get());
+            animal.setPigPen(pen); // Nếu exported thì null
             animal.setQuantity(request.getQuantity());
 
-            // Cập nhật số lượng trong pigPen
-            PigPen pen = pigPen.get();
-            pen.setQuantity(pen.getQuantity() + request.getQuantity());
-            pigPenService.save(pen);
+            // Cập nhật số lượng trong pigPen nếu không phải exported
+            if (pen != null) {
+                pen.setQuantity(pen.getQuantity() + request.getQuantity());
+                pigPenService.save(pen);
+            }
 
             animalService.save(animal);
             return ResponseEntity.ok(animal);
@@ -89,13 +94,6 @@ public class AnimalController {
                 return ResponseEntity.notFound().build();
             }
 
-            // Kiểm tra pigPen tồn tại
-            Optional<PigPen> pigPen = pigPenService.findById(request.getPenId());
-            if (pigPen.isEmpty()) {
-                return ResponseEntity.badRequest().body("Chuồng nuôi không tồn tại");
-            }
-
-            // Cập nhật thông tin animal
             Animal animal = existing.get();
             Long originalPenId = animal.getPigPen() != null ? animal.getPigPen().getPenId() : null;
             Integer originalQuantity = animal.getQuantity() != null ? animal.getQuantity() : 0;
@@ -106,35 +104,46 @@ public class AnimalController {
             animal.setStatus(request.getStatus());
             animal.setWeight(request.getWeight());
 
-            // Nếu thay đổi chuồng nuôi, cập nhật số lượng ở cả hai chuồng
-            if (!request.getPenId().equals(originalPenId)) {
-                // Giảm số lượng ở chuồng cũ
-                if (originalPenId != null) {
-                    Optional<PigPen> oldPen = pigPenService.findById(originalPenId);
-                    if (oldPen.isPresent()) {
-                        PigPen oldPigPen = oldPen.get();
-                        oldPigPen.setQuantity(oldPigPen.getQuantity() - originalQuantity);
-                        pigPenService.save(oldPigPen);
-                    }
+            // Nếu status là EXPORTED thì bỏ qua xử lý chuồng
+            if ("EXPORTED".equalsIgnoreCase(request.getStatus())) {
+                animal.setPigPen(null);
+            } else {
+                // Kiểm tra pigPen tồn tại
+                Optional<PigPen> pigPen = pigPenService.findById(request.getPenId());
+                if (pigPen.isEmpty()) {
+                    return ResponseEntity.badRequest().body("Chuồng nuôi không tồn tại");
                 }
-
-                // Tăng số lượng ở chuồng mới
                 PigPen newPen = pigPen.get();
-                newPen.setQuantity(newPen.getQuantity() + request.getQuantity());
-                pigPenService.save(newPen);
-                animal.setPigPen(newPen);
-            }
-            // Nếu vẫn ở cùng một chuồng nhưng số lượng đã thay đổi
-            else if (!request.getQuantity().equals(originalQuantity)) {
-                PigPen currentPen = pigPen.get();
-                int quantityDifference = request.getQuantity() - originalQuantity;
-                currentPen.setQuantity(currentPen.getQuantity() + quantityDifference);
-                pigPenService.save(currentPen);
-                animal.setPigPen(currentPen);
-            }
-            else {
-                // Giữ nguyên chuồng và không thay đổi số lượng
-                animal.setPigPen(pigPen.get());
+
+                // Nếu thay đổi chuồng nuôi, cập nhật số lượng ở cả hai chuồng
+                if (!request.getPenId().equals(originalPenId)) {
+                    // Giảm số lượng ở chuồng cũ
+                    if (originalPenId != null) {
+                        Optional<PigPen> oldPen = pigPenService.findById(originalPenId);
+                        if (oldPen.isPresent()) {
+                            PigPen oldPigPen = oldPen.get();
+                            oldPigPen.setQuantity(oldPigPen.getQuantity() - originalQuantity);
+                            pigPenService.save(oldPigPen);
+                        }
+                    }
+
+                    // Tăng số lượng ở chuồng mới
+                    newPen.setQuantity(newPen.getQuantity() + request.getQuantity());
+                    pigPenService.save(newPen);
+                    animal.setPigPen(newPen);
+                }
+                // Nếu vẫn ở cùng một chuồng nhưng số lượng đã thay đổi
+                else if (!request.getQuantity().equals(originalQuantity)) {
+                    PigPen currentPen = newPen;
+                    int quantityDifference = request.getQuantity() - originalQuantity;
+                    currentPen.setQuantity(currentPen.getQuantity() + quantityDifference);
+                    pigPenService.save(currentPen);
+                    animal.setPigPen(currentPen);
+                }
+                else {
+                    // Giữ nguyên chuồng và không thay đổi số lượng
+                    animal.setPigPen(newPen);
+                }
             }
 
             // Cập nhật số lượng của animal sau khi đã xử lý logic chuồng
