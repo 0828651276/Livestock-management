@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/animals")
@@ -313,6 +314,44 @@ public class AnimalController {
             e.printStackTrace(); // Ghi log lỗi chi tiết
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Lỗi khi xuất chuồng: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/exported/search")
+    public ResponseEntity<?> searchExportedAnimals(
+            @RequestParam(required = false) Long pigId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate entryDateFrom,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate entryDateTo) {
+        try {
+            List<Animal> exportedAnimals = animalService.findByStatus("EXPORTED");
+            
+            // Lọc theo ID nếu có
+            if (pigId != null) {
+                exportedAnimals = exportedAnimals.stream()
+                    .filter(animal -> animal.getPigId().equals(pigId))
+                    .collect(Collectors.toList());
+            }
+            
+            // Lọc theo ngày nhập
+            if (entryDateFrom != null || entryDateTo != null) {
+                exportedAnimals = exportedAnimals.stream()
+                    .filter(animal -> {
+                        if (entryDateFrom != null && animal.getEntryDate().isBefore(entryDateFrom)) {
+                            return false;
+                        }
+                        if (entryDateTo != null && animal.getEntryDate().isAfter(entryDateTo)) {
+                            return false;
+                        }
+                        return true;
+                    })
+                    .collect(Collectors.toList());
+            }
+            
+            return ResponseEntity.ok(exportedAnimals);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error searching exported animals: " + e.getMessage());
         }
     }
 }
