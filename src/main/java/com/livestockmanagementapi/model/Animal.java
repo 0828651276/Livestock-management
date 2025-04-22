@@ -22,5 +22,6 @@ public class Animal {//Cá thể (con lợn)
     private LocalDate exitDate;
     private String status;
     private BigDecimal weight;
+    private Integer quantity; // Số lượng
 }
 

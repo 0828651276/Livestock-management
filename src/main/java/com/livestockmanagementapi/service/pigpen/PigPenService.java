@@ -1,6 +1,8 @@
 package com.livestockmanagementapi.service.pigpen;
 
+import com.livestockmanagementapi.model.Animal;
 import com.livestockmanagementapi.model.PigPen;
+import com.livestockmanagementapi.repository.AnimalRepository;
 import com.livestockmanagementapi.repository.PigPenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,9 @@ public class PigPenService implements IPigPenService {
 
     @Autowired
     private PigPenRepository pigPenRepository;
+
+    @Autowired
+    private AnimalRepository animalRepository;
 
     @Override
     public List<PigPen> findAll() {
@@ -136,5 +141,17 @@ public class PigPenService implements IPigPenService {
         return new ArrayList<>(uniquePens);
     }
 
+    @Override
+    public List<PigPen> findEmptyPens() {
+        try {
+            // Lấy tất cả chuồng nuôi đang hoạt động và có số lượng bằng 0
+            return findAll().stream()
+                    .filter(pen -> pen.getStatus() == com.livestockmanagementapi.model.type.PenStatus.ACTIVE)
+                    .filter(pen -> pen.getQuantity() == 0)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new RuntimeException("Error finding empty pens", e);
+        }
+    }
 
 }

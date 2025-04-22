@@ -1,6 +1,7 @@
 package com.livestockmanagementapi.service.animal;
 
 import com.livestockmanagementapi.model.Animal;
+import com.livestockmanagementapi.model.PigPen;
 import com.livestockmanagementapi.repository.AnimalRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -64,5 +65,11 @@ public class AnimalService implements IAnimalService {
     @Override
     public List<Animal> findByStatus(String status) {
         return animalRepository.findByStatusContainingIgnoreCase(status);
+    }
+
+    @Override
+    public List<Animal> findExportedAnimals() {
+        // Use the repository method to find animals with exactly "EXPORTED" status
+        return animalRepository.findByStatusEquals("EXPORTED");
     }
 }

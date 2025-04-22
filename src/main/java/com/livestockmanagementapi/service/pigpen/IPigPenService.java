@@ -22,4 +22,6 @@ public interface IPigPenService extends IGenericService<PigPen> {
 
     List<PigPen> findByEmployeeId(String employeeId);
 
+    List<PigPen> findEmptyPens();
+
 }
