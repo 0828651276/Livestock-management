@@ -1,4 +1,4 @@
-package com.livestockmanagementapi.model.type;
+package com.livestockmanagementapi.model.dto.pigpen;
 
 import java.time.LocalDate;
 import java.util.Set;
