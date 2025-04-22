@@ -15,10 +15,6 @@ public class PigPen {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long penId;
 
-    @ManyToOne
-    @JoinColumn(name = "employee_id")
-    private Employee caretaker;
-
     @ManyToMany
     @JoinTable(
             name = "pig_pen_caretakers",
