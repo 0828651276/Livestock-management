@@ -130,12 +130,10 @@ public class PigPenService implements IPigPenService {
     public List<PigPen> findByEmployeeId(String employeeId) {
         if (employeeId == null) return List.of();
 
-        List<PigPen> pensByCaretaker = pigPenRepository.findByCaretakerEmployeeId(employeeId);
         List<PigPen> pensByAnyCaretaker = pigPenRepository.findByAnyCaretakerEmployeeId(employeeId);
 
         // Gộp 2 danh sách vào một Set để tự động loại trùng
         Set<PigPen> uniquePens = new HashSet<>();
-        uniquePens.addAll(pensByCaretaker);
         uniquePens.addAll(pensByAnyCaretaker);
 
         return new ArrayList<>(uniquePens);

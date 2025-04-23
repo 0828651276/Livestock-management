@@ -9,7 +9,7 @@ import java.time.LocalDate;
 @Entity
 @Data
 @Table(name= "animal")
-public class Animal {//Cá thể (con lợn)
+public class Animal {//Cá thể
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long pigId;

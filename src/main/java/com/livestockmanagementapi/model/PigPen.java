@@ -10,14 +10,10 @@ import java.util.Set;
 @Entity
 @Data
 @Table(name= "pig_pen")
-public class PigPen {
+public class PigPen { // chuồng
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long penId;
-
-    @ManyToOne
-    @JoinColumn(name = "employee_id")
-    private Employee caretaker;
 
     @ManyToMany
     @JoinTable(

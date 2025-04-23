@@ -11,8 +11,6 @@ import java.util.List;
 @Repository
 public interface PigPenRepository extends JpaRepository<PigPen, Long> {
     // Tìm chuồng theo người chăm sóc đơn lẻ (tương thích ngược)
-    List<PigPen> findByCaretakerEmployeeId(String employeeId);
-
     // Tìm chuồng theo bất kỳ người chăm sóc nào trong danh sách caretakers
     @Query("SELECT p FROM PigPen p JOIN p.caretakers c WHERE c.employeeId = :employeeId")
     List<PigPen> findByAnyCaretakerEmployeeId(@Param("employeeId") String employeeId);
