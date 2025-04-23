@@ -60,17 +60,23 @@ public class FeedPlanService implements IFeedPlanService {
     }
 
     @Override
-    public List findAll() {
+    public List<FeedPlan> searchByPenName(String penName) {
+        return feedPlanRepository.findByPigPen_NameContainingIgnoreCase(penName);
+    }
+
+
+    @Override
+    public List<FeedPlan> findAll() {
         return List.of();
     }
 
     @Override
-    public Optional findById(Long id) {
-        return feedPlanRepository.findById(id);
+    public Optional<FeedPlan> findById(Long id) {
+        return Optional.empty();
     }
 
     @Override
-    public void save(Object o) {
+    public void save(FeedPlan feedPlan) {
 
     }
 
@@ -78,5 +84,4 @@ public class FeedPlanService implements IFeedPlanService {
     public void deleteById(Long id) {
 
     }
-
 }

@@ -19,7 +19,7 @@ public class FeedFlanController {
 
     private final FeedPlanService feedPlanService;
 
-    @PostMapping("/")
+    @PostMapping
     public ResponseEntity<Void> createFeedPlan(@RequestBody FeedPlanRequest request) {
         feedPlanService.createFeedPlan(request);
         return ResponseEntity.ok().build();
@@ -45,4 +45,11 @@ public class FeedFlanController {
         return feedPlan.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<FeedPlan>> searchFeedPlansByPenName(@RequestParam(value = "penName") String penName) {
+        List<FeedPlan> plans = feedPlanService.searchByPenName(penName);
+        return ResponseEntity.ok(plans);
+    }
+
 }

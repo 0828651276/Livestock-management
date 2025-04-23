@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface FeedPlanRepository extends JpaRepository<FeedPlan, Long> {
+    List<FeedPlan> findByPigPen_NameContainingIgnoreCase(String name);
 
     @Query("SELECT new com.livestockmanagementapi.model.dto.FeedPlan.DailyFeedSummaryDTO(" +
             "p.penId, p.name, f.feedType, SUM(f.dailyFood)) " +
