@@ -17,9 +17,6 @@ public class FeedPlan {
     private Long dailyFood;   // Lượng ăn mỗi ngày
     private String unit;              // Đơn vị (kg, g, ...)
 
-    private LocalDate startDate;
-    private LocalDate endDate;
-
     @ManyToOne
     @JoinColumn(name = "pen_id")
     private PigPen pigPen;

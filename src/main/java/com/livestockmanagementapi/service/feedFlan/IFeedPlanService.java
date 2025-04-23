@@ -1,4 +1,6 @@
 package com.livestockmanagementapi.service.feedFlan;
 
-public interface IFeedPlanService {
+import com.livestockmanagementapi.service.IGenericService;
+
+public interface IFeedPlanService extends IGenericService {
 }

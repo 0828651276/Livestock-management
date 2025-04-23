@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/plan")
@@ -38,9 +39,10 @@ public class FeedFlanController {
         return ResponseEntity.ok(summaries);
     }
 
-//    @GetMapping("/by-herd")
-//    public ResponseEntity<List<FeedPlan>> getPlansByHerdCode(@RequestParam String herdCode) {
-//        return ResponseEntity.ok(feedPlanService.getPlansByHerdCode(herdCode));
-//    }
-
+    @GetMapping("/{id}")
+    public ResponseEntity<FeedPlan> getFeedPlanById(@PathVariable Long id) {
+        Optional<FeedPlan> feedPlan = feedPlanService.findById(id);
+        return feedPlan.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
 }

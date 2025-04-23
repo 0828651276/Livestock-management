@@ -5,8 +5,6 @@ import com.livestockmanagementapi.service.IGenericService;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
-
 public interface IAnimalService extends IGenericService<Animal> {
 
     void save(Animal animal);
@@ -16,4 +14,7 @@ public interface IAnimalService extends IGenericService<Animal> {
     List<Animal> findByPenId(Long penId);
 
     List<Animal> findByStatus(String status);
+
+    // Add a new method specifically for exported animals
+    List<Animal> findExportedAnimals();
 }

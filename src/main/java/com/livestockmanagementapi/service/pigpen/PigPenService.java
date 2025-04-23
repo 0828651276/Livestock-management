@@ -144,24 +144,10 @@ public class PigPenService implements IPigPenService {
     @Override
     public List<PigPen> findEmptyPens() {
         try {
-            // Get all pig pens
-            List<PigPen> allPens = findAll();
-
-            // Fetch and collect all pens that have animals
-            List<PigPen> pensWithAnimals = new ArrayList<>();
-            for (PigPen pen : allPens) {
-                // Attempt to find animals for this pen
-                List<Animal> animalsInPen = animalRepository.findByPigPenPenId(pen.getPenId());
-                // If there are animals, add to list
-                if (animalsInPen != null && !animalsInPen.isEmpty()) {
-                    pensWithAnimals.add(pen);
-                }
-            }
-
-            // Filter out pens that have animals, only keep ACTIVE pens
-            return allPens.stream()
-                    .filter(pen -> !pensWithAnimals.contains(pen))
+            // Lấy tất cả chuồng nuôi đang hoạt động và có số lượng bằng 0
+            return findAll().stream()
                     .filter(pen -> pen.getStatus() == com.livestockmanagementapi.model.type.PenStatus.ACTIVE)
+                    .filter(pen -> pen.getQuantity() == 0)
                     .collect(Collectors.toList());
         } catch (Exception e) {
             throw new RuntimeException("Error finding empty pens", e);

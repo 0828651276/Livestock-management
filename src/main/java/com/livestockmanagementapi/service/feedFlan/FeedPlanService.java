@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,8 +23,6 @@ public class FeedPlanService implements IFeedPlanService {
         FeedPlan plan = new FeedPlan();
         plan.setFeedType(request.getFeedType());
         plan.setDailyFood(request.getDailyFood());
-        plan.setStartDate(request.getStartDate());
-        plan.setEndDate(request.getEndDate());
 
         if (request.getPigPenId() != null) {
             PigPen pen = pigPenRepository.findById(request.getPigPenId())
@@ -46,8 +45,6 @@ public class FeedPlanService implements IFeedPlanService {
 
         plan.setFeedType(request.getFeedType());
         plan.setDailyFood(request.getDailyFood());
-        plan.setStartDate(request.getStartDate());
-        plan.setEndDate(request.getEndDate());
 
         if (request.getPigPenId() != null) {
             PigPen pen = pigPenRepository.findById(request.getPigPenId())
@@ -62,8 +59,24 @@ public class FeedPlanService implements IFeedPlanService {
         return feedPlanRepository.getDailyFeedSummary(LocalDate.now());
     }
 
-//    public List<FeedPlan> getPlansByHerdCode(String herdCode) {
-//        return feedPlanRepository.findByHerdCode(herdCode);
-//    }
+    @Override
+    public List findAll() {
+        return List.of();
+    }
+
+    @Override
+    public Optional findById(Long id) {
+        return feedPlanRepository.findById(id);
+    }
+
+    @Override
+    public void save(Object o) {
+
+    }
+
+    @Override
+    public void deleteById(Long id) {
+
+    }
 
 }

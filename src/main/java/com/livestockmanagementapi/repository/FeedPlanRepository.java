@@ -14,8 +14,7 @@ public interface FeedPlanRepository extends JpaRepository<FeedPlan, Long> {
     @Query("SELECT new com.livestockmanagementapi.model.dto.FeedPlan.DailyFeedSummaryDTO(" +
             "p.penId, p.name, f.feedType, SUM(f.dailyFood)) " +
             "FROM FeedPlan f JOIN f.pigPen p " +
-            "WHERE :today BETWEEN f.startDate AND f.endDate " +
-            "GROUP BY p.penId, p.name, f.feedType, f.unit")
+            "GROUP BY p.penId, p.name, f.feedType")
     List<DailyFeedSummaryDTO> getDailyFeedSummary(@Param("today") LocalDate today);
 
 //    @Query("SELECT f FROM FeedPlan f WHERE f.feedBatch.herdCode = :herdCode")
