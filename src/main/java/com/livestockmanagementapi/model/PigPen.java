@@ -10,7 +10,7 @@ import java.util.Set;
 @Entity
 @Data
 @Table(name= "pig_pen")
-public class PigPen {
+public class PigPen { // chuồng
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long penId;
