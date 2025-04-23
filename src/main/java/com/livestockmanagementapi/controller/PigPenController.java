@@ -41,7 +41,7 @@ public class PigPenController {
 
     @PostMapping
     public ResponseEntity<PigPen> addPigPen(@RequestBody PigPen pigPen) {
-        // Xử lý cả caretaker và caretakers
+        // Chỉ xử lý caretakers (nhiều người)
         handleCaretakers(pigPen);
         pigPenService.save(pigPen);
         return ResponseEntity.ok(pigPen);
@@ -52,7 +52,7 @@ public class PigPenController {
         Optional<PigPen> existing = pigPenService.findById(id);
         if (existing.isPresent()) {
             updatedPigPen.setPenId(id);
-            // Xử lý cả caretaker và caretakers
+            // Chỉ xử lý caretakers (nhiều người)
             handleCaretakers(updatedPigPen);
             pigPenService.save(updatedPigPen);
             return ResponseEntity.ok(updatedPigPen);
@@ -95,17 +95,6 @@ public class PigPenController {
             // Xóa nhân viên khỏi danh sách caretakers
             pigPen.getCaretakers().remove(employee);
 
-            // Nếu nhân viên cũng là caretaker chính (primary), cần thay thế
-            if (pigPen.getCaretaker() != null && pigPen.getCaretaker().getEmployeeId().equals(employeeId)) {
-                // Nếu còn nhân viên khác trong danh sách, chọn người đầu tiên làm caretaker chính
-                if (!pigPen.getCaretakers().isEmpty()) {
-                    pigPen.setCaretaker(pigPen.getCaretakers().iterator().next());
-                } else {
-                    // Nếu không còn ai, đặt null
-                    pigPen.setCaretaker(null);
-                }
-            }
-
             // Lưu chuồng đã cập nhật
             pigPenService.save(pigPen);
 
@@ -120,11 +109,10 @@ public class PigPenController {
 
     /**
      * Xử lý logic caretakers
-     * - Nếu có caretaker đơn lẻ và không có caretakers, thêm caretaker vào caretakers
-     * - Nếu có caretakers nhưng không có caretaker, đặt caretaker là người đầu tiên trong caretakers
+     * - Chỉ còn lại trường caretakers (nhiều người)
+     * - Nếu nhận vào danh sách employee chỉ có id, sẽ lấy đủ thông tin từ repository
      */
     private void handleCaretakers(PigPen pigPen) {
-        // Xử lý trường hợp nhận ID thay vì object đầy đủ
         if (pigPen.getCaretakers() != null) {
             Set<Employee> resolvedCaretakers = pigPen.getCaretakers().stream()
                     .map(employee -> {
@@ -134,18 +122,7 @@ public class PigPenController {
                         return employee;
                     })
                     .collect(Collectors.toSet());
-
             pigPen.setCaretakers(resolvedCaretakers);
-        }
-
-        // Nếu có caretaker đơn lẻ nhưng không có trong caretakers, thêm vào
-        if (pigPen.getCaretaker() != null && !pigPen.getCaretakers().contains(pigPen.getCaretaker())) {
-            pigPen.getCaretakers().add(pigPen.getCaretaker());
-        }
-
-        // Nếu có caretakers nhưng không có caretaker, đặt caretaker là người đầu tiên
-        if (pigPen.getCaretakers() != null && !pigPen.getCaretakers().isEmpty() && pigPen.getCaretaker() == null) {
-            pigPen.setCaretaker(pigPen.getCaretakers().iterator().next());
         }
     }
 
@@ -202,14 +179,6 @@ public class PigPenController {
     }
 
     /**
-     * Search for pig pens by caretaker id
-     */
-//    @GetMapping("/search/caretaker/{caretakerId}")
-//    public List<PigPen> searchPigPensByCaretaker(@PathVariable String caretakerId) {
-//        return pigPenService.findByCaretakerId(caretakerId);
-//    }
-
-    /**
      * Search for pig pens by quantity range
      */
     @GetMapping("/search/quantity")
@@ -224,7 +193,4 @@ public class PigPenController {
     public List<PigPen> getMyPigPens(@RequestParam String employeeId) {
         return pigPenService.findByEmployeeId(employeeId);
     }
-
-
-
 }

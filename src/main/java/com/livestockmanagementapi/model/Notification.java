@@ -2,8 +2,7 @@ package com.livestockmanagementapi.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
-
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -13,9 +12,12 @@ public class Notification { //Thông báo
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Lob
+    @Column(length = 2000)
     private String content;
 
-    private LocalDate postedDate = LocalDate.now();
-}
+    @Column(name = "posted_at")
+    private LocalDateTime postedAt = LocalDateTime.now();
 
+    @Column(name = "is_read", nullable = false)
+    private boolean read = false;
+}
