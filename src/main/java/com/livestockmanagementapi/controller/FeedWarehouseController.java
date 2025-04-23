@@ -1,7 +1,7 @@
 package com.livestockmanagementapi.controller;
 
 import com.livestockmanagementapi.model.FeedWarehouse;
-import com.livestockmanagementapi.model.dto.feedWarehouse.FeedImportRequest;
+import com.livestockmanagementapi.model.dto.feedWarehouse.FeedRequest;
 import com.livestockmanagementapi.model.dto.feedWarehouse.FeedInventoryDTO;
 import com.livestockmanagementapi.service.feedWarehouse.FeedWarehouseService;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +35,7 @@ public class FeedWarehouseController {
         }
     }
 
+//    them moi thuc an
     @PostMapping("")
     public FeedWarehouse addFeedWarehouse(@RequestBody FeedWarehouse feedWarehouse) {
         feedWarehouseService.save(feedWarehouse);
@@ -60,9 +61,22 @@ public class FeedWarehouseController {
 
 //    thêm thức ăn vào kho
     @PostMapping("/import")
-    public ResponseEntity<Void> importFeed(@RequestBody FeedImportRequest request) {
+    public ResponseEntity<Void> importFeed(@RequestBody FeedRequest request) {
         feedWarehouseService.importFeed(request);
         return ResponseEntity.ok().build();
     }
+
+    //xuat thuc an ra khoi kho
+    @PostMapping("/export")
+    public ResponseEntity<Void> exportFeed(@RequestBody FeedRequest request) {
+        feedWarehouseService.exportFeed(request);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<FeedInventoryDTO>> searchFeedInventory(@RequestParam("keyword") String keyword) {
+        return ResponseEntity.ok(feedWarehouseService.searchFeedInventory(keyword));
+    }
+
 }
 
