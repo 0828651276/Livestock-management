@@ -131,41 +131,14 @@ public class EmployeeController {
         if (employeeOpt.isPresent()) {
             Employee employee = employeeOpt.get();
 
-            // 1. Xử lý chuồng có nhân viên này làm caretaker chính
-            List<PigPen> pigPens = pigPenRepository.findByCaretakerEmployeeId(id);
-            for (PigPen pen : pigPens) {
-                // Xóa nhân viên khỏi caretaker chính
-                pen.setCaretaker(null);
-
-                // Nếu còn nhân viên khác trong caretakers, đặt một người làm caretaker chính
-                if (pen.getCaretakers() != null) {
-                    pen.getCaretakers().remove(employee);
-                    if (!pen.getCaretakers().isEmpty()) {
-                        pen.setCaretaker(pen.getCaretakers().iterator().next());
-                    }
-                }
-            }
-
-            // 2. Xử lý chuồng có nhân viên này trong danh sách caretakers
+            // 1. Xử lý chuồng có nhân viên này trong danh sách caretakers
             List<PigPen> pigPensWithCaretaker = pigPenRepository.findByAnyCaretakerEmployeeId(id);
             for (PigPen pen : pigPensWithCaretaker) {
-                if (!pigPens.contains(pen)) { // Tránh xử lý trùng với danh sách ở trên
-                    pen.getCaretakers().remove(employee);
-
-                    // Nếu nhân viên này là caretaker chính và vẫn còn caretakers khác
-                    if (pen.getCaretaker() != null && pen.getCaretaker().getEmployeeId().equals(id) && !pen.getCaretakers().isEmpty()) {
-                        pen.setCaretaker(pen.getCaretakers().iterator().next());
-                    }
-                }
+                pen.getCaretakers().remove(employee);
             }
+            pigPenRepository.saveAll(pigPensWithCaretaker);
 
-            // Kết hợp danh sách chuồng cần cập nhật và lưu
-            pigPens.addAll(pigPensWithCaretaker.stream()
-                    .filter(pen -> !pigPens.contains(pen))
-                    .collect(Collectors.toList()));
-            pigPenRepository.saveAll(pigPens);
-
-            // 3. Xoá nhân viên
+            // 2. Xoá nhân viên
             employeeService.deleteByIdString(id);
 
             return ResponseEntity.noContent().build();
