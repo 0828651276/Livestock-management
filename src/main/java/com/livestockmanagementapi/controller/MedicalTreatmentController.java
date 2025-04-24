@@ -40,11 +40,9 @@ public class MedicalTreatmentController {
             return ResponseEntity.notFound().build();
         }
         MedicalTreatment treatment = existing.get();
-        treatment.setAnimal(animalRepository.findById(dto.getPigId()).orElse(null));
         treatment.setPen(pigPenRepository.findById(dto.getPenId()).orElse(null));
         treatment.setDate(dto.getDate());
         treatment.setTreatmentType(dto.getTreatmentType());
-        treatment.setVeterinarian(dto.getVeterinarian());
         treatment.setMedicine(dto.getMedicine());
         treatment.setNote(dto.getNote());
         MedicalTreatment saved = medicalTreatmentRepository.save(treatment);
@@ -84,10 +82,8 @@ public class MedicalTreatmentController {
                 dtos.add(new AnimalSimpleDTO(animal));
                 // Tạo mới MedicalTreatment cho animal nếu chưa có trong ngày
                 MedicalTreatment mt = new MedicalTreatment();
-                mt.setAnimal(animal);
                 mt.setDate(LocalDate.now());
                 mt.setTreatmentType("");
-                mt.setVeterinarian("");
                 mt.setMedicine("");
                 mt.setNote("");
                 mt.setPen(animal.getPigPen()); // Nếu Animal có quan hệ với Pen
