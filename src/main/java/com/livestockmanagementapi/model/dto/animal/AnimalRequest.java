@@ -6,8 +6,6 @@ import lombok.Data;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import com.livestockmanagementapi.model.dto.animal.PenRequiredIfNotExported;
-
 @Data
 @PenRequiredIfNotExported
 public class AnimalRequest {
@@ -22,9 +20,13 @@ public class AnimalRequest {
     @PastOrPresent(message = "Ngày xuất phải là ngày trong quá khứ hoặc hiện tại")
     private LocalDate exitDate;
 
-    @NotBlank(message = "Trạng thái không được để trống")
-    @Pattern(regexp = "^(ACTIVE|SICK|UNVACCINATED|EXPORTED)$", message = "Trạng thái không hợp lệ")
-    private String status;
+    @NotBlank(message = "Trạng thái sức khỏe không được để trống")
+    @Pattern(regexp = "^(ACTIVE|SICK)$", message = "Trạng thái sức khỏe không hợp lệ")
+    private String healthStatus;
+
+    @NotBlank(message = "Trạng thái nuôi không được để trống")
+    @Pattern(regexp = "^(RAISING|EXPORTED)$", message = "Trạng thái nuôi không hợp lệ")
+    private String raisingStatus;
 
     @NotNull(message = "Cân nặng không được để trống")
     @DecimalMin(value = "0.1", message = "Cân nặng phải lớn hơn 0")

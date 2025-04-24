@@ -1,7 +1,6 @@
 package com.livestockmanagementapi.service.animal;
 
 import com.livestockmanagementapi.model.Animal;
-import com.livestockmanagementapi.model.PigPen;
 import com.livestockmanagementapi.repository.AnimalRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,38 +37,49 @@ public class AnimalService implements IAnimalService {
     }
 
     @Override
-    public List<Animal> search(String name, String status, LocalDate entryDateFrom, LocalDate entryDateTo, Long penId) {
-        List<Animal> allAnimals = findAll();
-        
-        return allAnimals.stream()
-                .filter(animal -> name == null || 
-                        (animal.getName() != null && animal.getName().toLowerCase().contains(name.toLowerCase())))
-                .filter(animal -> status == null || 
-                        (animal.getStatus() != null && animal.getStatus().equalsIgnoreCase(status)))
-                .filter(animal -> entryDateFrom == null || 
-                        (animal.getEntryDate() != null && !animal.getEntryDate().isBefore(entryDateFrom)))
-                .filter(animal -> entryDateTo == null || 
-                        (animal.getEntryDate() != null && !animal.getEntryDate().isAfter(entryDateTo)))
-                .filter(animal -> penId == null || 
+    public List<Animal> search(String name, String healthStatus, String raisingStatus,
+                               LocalDate entryDateFrom, LocalDate entryDateTo, Long penId) {
+        List<Animal> animals = animalRepository.findAll();
+
+        // Lọc theo các tiêu chí
+        return animals.stream()
+                .filter(animal -> name == null || animal.getName().toLowerCase().contains(name.toLowerCase()))
+                .filter(animal -> healthStatus == null ||
+                        animal.getHealthStatus().name().equalsIgnoreCase(healthStatus))
+                .filter(animal -> raisingStatus == null ||
+                        animal.getRaisingStatus().name().equalsIgnoreCase(raisingStatus))
+                .filter(animal -> entryDateFrom == null ||
+                        animal.getEntryDate() == null ||
+                        !animal.getEntryDate().isBefore(entryDateFrom))
+                .filter(animal -> entryDateTo == null ||
+                        animal.getEntryDate() == null ||
+                        !animal.getEntryDate().isAfter(entryDateTo))
+                .filter(animal -> penId == null ||
                         (animal.getPigPen() != null && animal.getPigPen().getPenId().equals(penId)))
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<Animal> findByPenId(Long penId) {
-        return findAll().stream()
-                .filter(animal -> animal.getPigPen() != null && animal.getPigPen().getPenId().equals(penId))
+        return animalRepository.findAll().stream()
+                .filter(animal -> animal.getPigPen() != null &&
+                        animal.getPigPen().getPenId().equals(penId))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<Animal> findByStatus(String status) {
-        return animalRepository.findByStatusContainingIgnoreCase(status);
+    public List<Animal> findByHealthStatus(String healthStatus) {
+        Animal.HealthStatus status = Animal.HealthStatus.valueOf(healthStatus.toUpperCase());
+        return animalRepository.findAll().stream()
+                .filter(animal -> animal.getHealthStatus() == status)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<Animal> findExportedAnimals() {
-        // Use the repository method to find animals with exactly "EXPORTED" status
-        return animalRepository.findByStatusEquals("EXPORTED");
+    public List<Animal> findByRaisingStatus(String raisingStatus) {
+        Animal.RaisingStatus status = Animal.RaisingStatus.valueOf(raisingStatus.toUpperCase());
+        return animalRepository.findAll().stream()
+                .filter(animal -> animal.getRaisingStatus() == status)
+                .collect(Collectors.toList());
     }
 }

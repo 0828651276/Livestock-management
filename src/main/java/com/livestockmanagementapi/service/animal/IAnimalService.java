@@ -5,16 +5,30 @@ import com.livestockmanagementapi.service.IGenericService;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
+
 public interface IAnimalService extends IGenericService<Animal> {
 
     void save(Animal animal);
 
-    List<Animal> search(String name, String status, LocalDate entryDateFrom, LocalDate entryDateTo, Long penId);
+    /**
+     * Tìm kiếm động vật theo nhiều tiêu chí
+     */
+    List<Animal> search(String name, String healthStatus, String raisingStatus,
+                        LocalDate entryDateFrom, LocalDate entryDateTo, Long penId);
 
+    /**
+     * Tìm danh sách động vật theo ID chuồng
+     */
     List<Animal> findByPenId(Long penId);
 
-    List<Animal> findByStatus(String status);
+    /**
+     * Tìm danh sách động vật theo trạng thái sức khỏe
+     */
+    List<Animal> findByHealthStatus(String healthStatus);
 
-    // Add a new method specifically for exported animals
-    List<Animal> findExportedAnimals();
+    /**
+     * Tìm danh sách động vật theo trạng thái nuôi
+     */
+    List<Animal> findByRaisingStatus(String raisingStatus);
 }
