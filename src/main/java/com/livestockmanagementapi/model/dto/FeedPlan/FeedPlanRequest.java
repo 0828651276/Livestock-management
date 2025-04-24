@@ -1,7 +1,5 @@
 package com.livestockmanagementapi.model.dto.FeedPlan;
 
-import java.time.LocalDate;
-
 public class FeedPlanRequest {
     private Long id; // optional: nếu null thì là thêm mới, nếu có thì là cập nhật
     private String feedType;
