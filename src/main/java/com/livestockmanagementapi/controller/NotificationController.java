@@ -1,14 +1,18 @@
 package com.livestockmanagementapi.controller;
 
+import com.livestockmanagementapi.model.Employee;
 import com.livestockmanagementapi.model.Notification;
+import com.livestockmanagementapi.model.PigPen;
 import com.livestockmanagementapi.service.notification.INotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/notifications")
@@ -39,6 +43,14 @@ public class NotificationController {
     public ResponseEntity<Notification> addNotification(@RequestBody Notification notification) {
         notification.setPostedAt(LocalDateTime.now());
         notificationService.save(notification);
+
+        // Lấy danh sách employee chăm sóc các chuồng liên quan
+        Set<Employee> allEmployees = new HashSet<>();
+        for (PigPen pigPen : notification.getPigPens()) {
+            allEmployees.addAll(pigPen.getCaretakers());
+        }
+        notificationService.notifyEmployees(notification, allEmployees);
+
         return ResponseEntity.ok(notification);
     }
 
@@ -49,13 +61,22 @@ public class NotificationController {
             updatedNotification.setId(id);
             updatedNotification.setPostedAt(LocalDateTime.now());
             notificationService.save(updatedNotification);
+
+            // Xoá các bản ghi notification_employee cũ
+            notificationService.deleteNotificationEmployeesByNotificationId(id);
+
+            // Lấy lại danh sách employee từ các PigPen mới
+            Set<Employee> allEmployees = new HashSet<>();
+            for (PigPen pigPen : updatedNotification.getPigPens()) {
+                allEmployees.addAll(pigPen.getCaretakers());
+            }
+            notificationService.notifyEmployees(updatedNotification, allEmployees);
+
             return ResponseEntity.ok(updatedNotification);
         } else {
             return ResponseEntity.notFound().build();
         }
     }
-
-
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteNotification(@PathVariable Long id) {

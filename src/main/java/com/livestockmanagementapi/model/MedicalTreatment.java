@@ -13,9 +13,15 @@ public class MedicalTreatment {//Khám chữa trị
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "pig_id", nullable = false)
+    private Animal animal;
+
     private LocalDate date;
 
-    private String penCode;      // Mã chuồng
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "pen_id", nullable = false)
+    private PigPen pen;
 
     private String treatmentType; // Loại điều trị (ví dụ: cảm, tiêu chảy...)
 
@@ -25,4 +31,3 @@ public class MedicalTreatment {//Khám chữa trị
 
     private String note;
 }
-

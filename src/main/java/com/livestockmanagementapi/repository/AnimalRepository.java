@@ -10,5 +10,6 @@ public interface   AnimalRepository extends JpaRepository<Animal, Long> {
     List<Animal> findByPigPenPenId(Long penId);
     // Add a new method to find animals with EXPORTED status
     List<Animal> findByStatusEquals(String status);
+    List<Animal> findByStatusIn(List<String> statuses);
 }
 

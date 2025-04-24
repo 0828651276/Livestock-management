@@ -3,6 +3,8 @@ package com.livestockmanagementapi.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Data
@@ -20,4 +22,12 @@ public class Notification { //Thông báo
 
     @Column(name = "is_read", nullable = false)
     private boolean read = false;
+
+    @ManyToMany
+    @JoinTable(
+        name = "notification_pigpen",
+        joinColumns = @JoinColumn(name = "notification_id"),
+        inverseJoinColumns = @JoinColumn(name = "pen_id")
+    )
+    private Set<PigPen> pigPens = new HashSet<>(); // Danh sách chuồng liên quan
 }
