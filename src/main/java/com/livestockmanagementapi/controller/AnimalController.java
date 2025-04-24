@@ -39,8 +39,8 @@ public class AnimalController {
         }
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Animal> getAnimalById(@PathVariable Long id) {
+    @GetMapping("/{id:\\d+}")
+    public ResponseEntity<Animal> getAnimalById(@PathVariable("id") Long id) {
         try {
             return animalService.findById(id)
                     .map(ResponseEntity::ok)
@@ -365,6 +365,19 @@ public class AnimalController {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error searching exported animals: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Get all animals with SICK health status
+     */
+    @GetMapping("/sick")
+    public ResponseEntity<?> getSickAnimals() {
+        try {
+            return ResponseEntity.ok(animalService.findByHealthStatus("SICK"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 }
