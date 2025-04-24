@@ -47,12 +47,37 @@ public class FeedWarehouseService implements IFeedWarehouseService {
 
     // nhap thuc an
     public void importFeed(FeedRequest request) {
-        saveTransaction(request, FeedWarehouse.TransactionType.IMPORT);
-    }
+        FeedWarehouse feedWarehouse = new FeedWarehouse();
+        feedWarehouse.setFeedType(request.getFeedType());
+        feedWarehouse.setQuantity(request.getQuantity());
+        feedWarehouse.setDate(request.getDate());
+        feedWarehouse.setNote(request.getNote()); // ✅ Lưu ghi chú
+        feedWarehouse.setTransactionType(FeedWarehouse.TransactionType.IMPORT);
 
-    // xuat thuc an
+        if (request.getPigPenId() != null) {
+            PigPen pigPen = pigPenRepository.findById(request.getPigPenId())
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy chuồng heo"));
+            feedWarehouse.setPigPen(pigPen);
+        }
+
+        feedWarehouseRepository.save(feedWarehouse);
+    }
+// xuat thuc an
     public void exportFeed(FeedRequest request) {
-        saveTransaction(request, FeedWarehouse.TransactionType.EXPORT);
+        FeedWarehouse feedWarehouse = new FeedWarehouse();
+        feedWarehouse.setFeedType(request.getFeedType());
+        feedWarehouse.setQuantity(request.getQuantity());
+        feedWarehouse.setDate(request.getDate());
+        feedWarehouse.setNote(request.getNote()); // ✅ Lưu ghi chú
+        feedWarehouse.setTransactionType(FeedWarehouse.TransactionType.EXPORT);
+
+        if (request.getPigPenId() != null) {
+            PigPen pigPen = pigPenRepository.findById(request.getPigPenId())
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy chuồng heo"));
+            feedWarehouse.setPigPen(pigPen);
+        }
+
+        feedWarehouseRepository.save(feedWarehouse);
     }
 
     //luu thong tin
