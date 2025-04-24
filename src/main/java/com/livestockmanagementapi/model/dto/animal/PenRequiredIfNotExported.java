@@ -2,19 +2,14 @@ package com.livestockmanagementapi.model.dto.animal;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-
-@Documented
+@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = PenRequiredIfNotExportedValidator.class)
-@Target({ TYPE })
-@Retention(RUNTIME)
+@Documented
 public @interface PenRequiredIfNotExported {
-    String message() default "Chuồng nuôi không được để trống khi trạng thái không phải exported";
+    String message() default "Chuồng nuôi phải được chọn cho động vật đang nuôi";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

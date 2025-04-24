@@ -53,9 +53,9 @@ public class AnimalController {
     @PostMapping
     public ResponseEntity<?> addAnimal(@Valid @RequestBody AnimalRequest request) {
         try {
-            // Nếu status là EXPORTED thì không kiểm tra chuồng
+            // Nếu raisingStatus là EXPORTED thì không kiểm tra chuồng
             PigPen pen = null;
-            if (!"EXPORTED".equalsIgnoreCase(request.getStatus())) {
+            if (!"EXPORTED".equalsIgnoreCase(request.getRaisingStatus())) {
                 Optional<PigPen> pigPen = pigPenService.findById(request.getPenId());
                 if (pigPen.isEmpty()) {
                     return ResponseEntity.badRequest().body("Chuồng nuôi không tồn tại");
@@ -68,7 +68,8 @@ public class AnimalController {
             animal.setName(request.getName());
             animal.setEntryDate(request.getEntryDate());
             animal.setExitDate(request.getExitDate());
-            animal.setStatus(request.getStatus());
+            animal.setHealthStatus(Animal.HealthStatus.valueOf(request.getHealthStatus()));
+            animal.setRaisingStatus(Animal.RaisingStatus.valueOf(request.getRaisingStatus()));
             animal.setWeight(request.getWeight());
             animal.setPigPen(pen); // Nếu exported thì null
             animal.setQuantity(request.getQuantity());
@@ -102,11 +103,12 @@ public class AnimalController {
             animal.setName(request.getName());
             animal.setEntryDate(request.getEntryDate());
             animal.setExitDate(request.getExitDate());
-            animal.setStatus(request.getStatus());
+            animal.setHealthStatus(Animal.HealthStatus.valueOf(request.getHealthStatus()));
+            animal.setRaisingStatus(Animal.RaisingStatus.valueOf(request.getRaisingStatus()));
             animal.setWeight(request.getWeight());
 
-            // Nếu status là EXPORTED thì bỏ qua xử lý chuồng
-            if ("EXPORTED".equalsIgnoreCase(request.getStatus())) {
+            // Nếu raisingStatus là EXPORTED thì bỏ qua xử lý chuồng
+            if ("EXPORTED".equalsIgnoreCase(request.getRaisingStatus())) {
                 animal.setPigPen(null);
             } else {
                 // Kiểm tra pigPen tồn tại
@@ -189,12 +191,13 @@ public class AnimalController {
     @GetMapping("/search")
     public ResponseEntity<?> searchAnimals(
             @RequestParam(required = false) String name,
-            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String healthStatus,
+            @RequestParam(required = false) String raisingStatus,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate entryDateFrom,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate entryDateTo,
             @RequestParam(required = false) Long penId) {
         try {
-            return ResponseEntity.ok(animalService.search(name, status, entryDateFrom, entryDateTo, penId));
+            return ResponseEntity.ok(animalService.search(name, healthStatus, raisingStatus, entryDateFrom, entryDateTo, penId));
         } catch (Exception e) {
             e.printStackTrace(); // In chi tiết lỗi vào log
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -211,10 +214,20 @@ public class AnimalController {
         }
     }
 
-    @GetMapping("/status/{status}")
-    public ResponseEntity<?> getAnimalsByStatus(@PathVariable String status) {
+    @GetMapping("/health-status/{healthStatus}")
+    public ResponseEntity<?> getAnimalsByHealthStatus(@PathVariable String healthStatus) {
         try {
-            return ResponseEntity.ok(animalService.findByStatus(status));
+            return ResponseEntity.ok(animalService.findByHealthStatus(healthStatus));
+        } catch (Exception e) {
+            e.printStackTrace(); // In chi tiết lỗi vào log
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/raising-status/{raisingStatus}")
+    public ResponseEntity<?> getAnimalsByRaisingStatus(@PathVariable String raisingStatus) {
+        try {
+            return ResponseEntity.ok(animalService.findByRaisingStatus(raisingStatus));
         } catch (Exception e) {
             e.printStackTrace(); // In chi tiết lỗi vào log
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -228,8 +241,8 @@ public class AnimalController {
     @GetMapping("/exported")
     public ResponseEntity<?> getExportedAnimals() {
         try {
-            // Use the existing findByStatus method with "EXPORTED" status
-            List<Animal> exportedAnimals = animalService.findByStatus("EXPORTED");
+            // Use the findByRaisingStatus method with "EXPORTED" status
+            List<Animal> exportedAnimals = animalService.findByRaisingStatus("EXPORTED");
             return ResponseEntity.ok(exportedAnimals);
         } catch (Exception e) {
             e.printStackTrace(); // Log error details
@@ -290,7 +303,7 @@ public class AnimalController {
             Animal animal = existing.get();
 
             // Đặt trạng thái là đã xuất
-            animal.setStatus("EXPORTED");
+            animal.setRaisingStatus(Animal.RaisingStatus.EXPORTED);
 
             // Đặt ngày xuất là ngày hiện tại
             animal.setExitDate(LocalDate.now());
@@ -323,30 +336,30 @@ public class AnimalController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate entryDateFrom,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate entryDateTo) {
         try {
-            List<Animal> exportedAnimals = animalService.findByStatus("EXPORTED");
-            
+            List<Animal> exportedAnimals = animalService.findByRaisingStatus("EXPORTED");
+
             // Lọc theo ID nếu có
             if (pigId != null) {
                 exportedAnimals = exportedAnimals.stream()
-                    .filter(animal -> animal.getPigId().equals(pigId))
-                    .collect(Collectors.toList());
+                        .filter(animal -> animal.getPigId().equals(pigId))
+                        .collect(Collectors.toList());
             }
-            
+
             // Lọc theo ngày nhập
             if (entryDateFrom != null || entryDateTo != null) {
                 exportedAnimals = exportedAnimals.stream()
-                    .filter(animal -> {
-                        if (entryDateFrom != null && animal.getEntryDate().isBefore(entryDateFrom)) {
-                            return false;
-                        }
-                        if (entryDateTo != null && animal.getEntryDate().isAfter(entryDateTo)) {
-                            return false;
-                        }
-                        return true;
-                    })
-                    .collect(Collectors.toList());
+                        .filter(animal -> {
+                            if (entryDateFrom != null && animal.getEntryDate().isBefore(entryDateFrom)) {
+                                return false;
+                            }
+                            if (entryDateTo != null && animal.getEntryDate().isAfter(entryDateTo)) {
+                                return false;
+                            }
+                            return true;
+                        })
+                        .collect(Collectors.toList());
             }
-            
+
             return ResponseEntity.ok(exportedAnimals);
         } catch (Exception e) {
             e.printStackTrace();
