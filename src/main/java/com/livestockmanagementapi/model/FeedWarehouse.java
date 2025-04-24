@@ -15,8 +15,8 @@ public class FeedWarehouse {//Kho thức ăn
 
     private String feedType;
     private Long quantity;
-    private String unit;
     private LocalDate date;
+    private String note;
 
     @Enumerated(EnumType.STRING)
     private TransactionType transactionType;

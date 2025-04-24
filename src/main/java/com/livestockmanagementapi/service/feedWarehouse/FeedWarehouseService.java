@@ -9,6 +9,7 @@ import com.livestockmanagementapi.repository.PigPenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -76,4 +77,20 @@ public class FeedWarehouseService implements IFeedWarehouseService {
         return feedWarehouseRepository.searchInventoryByFeedType(keyword);
     }
 
+    public List<FeedWarehouse> getTransactionsByFeedType(String feedType) {
+        return feedWarehouseRepository.findTransactionsByFeedType(feedType);
+    }
+
+    @Override
+    public List<FeedWarehouse> filterTransactions(String feedType, FeedWarehouse.TransactionType transactionType, LocalDate startDate, LocalDate endDate) {
+        return feedWarehouseRepository.filterTransactions(feedType, transactionType, startDate, endDate);
+    }
+
+    @Override
+    public List<FeedWarehouse> getTransactionsByFilter(String feedType, String transactionType, LocalDate startDate, LocalDate endDate) {
+        if (transactionType != null && transactionType.isBlank()) {
+            transactionType = null;
+        }
+        return feedWarehouseRepository.findByFilter(feedType, transactionType, startDate, endDate);
+    }
 }

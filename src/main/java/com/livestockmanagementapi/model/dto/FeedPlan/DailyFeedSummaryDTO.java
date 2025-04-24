@@ -1,24 +1,34 @@
 package com.livestockmanagementapi.model.dto.FeedPlan;
 
 public class DailyFeedSummaryDTO {
-    private Long pigPenId;
+    private Long feedPlanId;
+    private Long penId;
     private String penName;
     private String feedType;
     private Long totalDailyFood;
 
-    public DailyFeedSummaryDTO(Long pigPenId, String penName, String feedType, Long totalDailyFood) {
-        this.pigPenId = pigPenId;
+    public DailyFeedSummaryDTO(Long feedPlanId, Long penId, String penName, String feedType, Long totalDailyFood) {
+        this.feedPlanId = feedPlanId;
+        this.penId = penId;
         this.penName = penName;
         this.feedType = feedType;
         this.totalDailyFood = totalDailyFood;
     }
 
-    public Long getPigPenId() {
-        return pigPenId;
+    public Long getFeedPlanId() {
+        return feedPlanId;
     }
 
-    public void setPigPenId(Long pigPenId) {
-        this.pigPenId = pigPenId;
+    public void setFeedPlanId(Long feedPlanId) {
+        this.feedPlanId = feedPlanId;
+    }
+
+    public Long getPenId() {
+        return penId;
+    }
+
+    public void setPenId(Long pigPenId) {
+        this.penId = pigPenId;
     }
 
     public String getPenName() {
@@ -44,6 +54,5 @@ public class DailyFeedSummaryDTO {
     public void setTotalDailyFood(Long totalDailyFood) {
         this.totalDailyFood = totalDailyFood;
     }
-
 }
 

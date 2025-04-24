@@ -15,7 +15,7 @@ import java.util.Optional;
 @RequestMapping("/api/plan")
 @RequiredArgsConstructor
 @CrossOrigin("*")
-public class FeedFlanController {
+public class FeedPlanController {
 
     private final FeedPlanService feedPlanService;
 

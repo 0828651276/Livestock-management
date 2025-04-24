@@ -7,8 +7,11 @@ public class FeedRequest {
     private Long quantity;
     private LocalDate date;
     private Long pigPenId;
+    private String note;
 
-    public FeedRequest(String feedType, Long quantity, LocalDate date, Long pigPenId) {
+
+    public FeedRequest(String feedType, Long quantity, LocalDate date, Long pigPenId, String note) {
+        this.note = note;
         this.feedType = feedType;
         this.quantity = quantity;
         this.date = date;
@@ -45,6 +48,14 @@ public class FeedRequest {
 
     public void setPigPenId(Long pigPenId) {
         this.pigPenId = pigPenId;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
     }
 }
 
