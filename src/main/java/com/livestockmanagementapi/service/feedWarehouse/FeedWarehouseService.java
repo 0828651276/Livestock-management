@@ -9,6 +9,7 @@ import com.livestockmanagementapi.repository.PigPenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,12 +47,37 @@ public class FeedWarehouseService implements IFeedWarehouseService {
 
     // nhap thuc an
     public void importFeed(FeedRequest request) {
-        saveTransaction(request, FeedWarehouse.TransactionType.IMPORT);
-    }
+        FeedWarehouse feedWarehouse = new FeedWarehouse();
+        feedWarehouse.setFeedType(request.getFeedType());
+        feedWarehouse.setQuantity(request.getQuantity());
+        feedWarehouse.setDate(request.getDate());
+        feedWarehouse.setNote(request.getNote()); // ✅ Lưu ghi chú
+        feedWarehouse.setTransactionType(FeedWarehouse.TransactionType.IMPORT);
 
-    // xuat thuc an
+        if (request.getPigPenId() != null) {
+            PigPen pigPen = pigPenRepository.findById(request.getPigPenId())
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy chuồng heo"));
+            feedWarehouse.setPigPen(pigPen);
+        }
+
+        feedWarehouseRepository.save(feedWarehouse);
+    }
+// xuat thuc an
     public void exportFeed(FeedRequest request) {
-        saveTransaction(request, FeedWarehouse.TransactionType.EXPORT);
+        FeedWarehouse feedWarehouse = new FeedWarehouse();
+        feedWarehouse.setFeedType(request.getFeedType());
+        feedWarehouse.setQuantity(request.getQuantity());
+        feedWarehouse.setDate(request.getDate());
+        feedWarehouse.setNote(request.getNote()); // ✅ Lưu ghi chú
+        feedWarehouse.setTransactionType(FeedWarehouse.TransactionType.EXPORT);
+
+        if (request.getPigPenId() != null) {
+            PigPen pigPen = pigPenRepository.findById(request.getPigPenId())
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy chuồng heo"));
+            feedWarehouse.setPigPen(pigPen);
+        }
+
+        feedWarehouseRepository.save(feedWarehouse);
     }
 
     //luu thong tin
@@ -76,4 +102,20 @@ public class FeedWarehouseService implements IFeedWarehouseService {
         return feedWarehouseRepository.searchInventoryByFeedType(keyword);
     }
 
+    public List<FeedWarehouse> getTransactionsByFeedType(String feedType) {
+        return feedWarehouseRepository.findTransactionsByFeedType(feedType);
+    }
+
+    @Override
+    public List<FeedWarehouse> filterTransactions(String feedType, FeedWarehouse.TransactionType transactionType, LocalDate startDate, LocalDate endDate) {
+        return feedWarehouseRepository.filterTransactions(feedType, transactionType, startDate, endDate);
+    }
+
+    @Override
+    public List<FeedWarehouse> getTransactionsByFilter(String feedType, String transactionType, LocalDate startDate, LocalDate endDate) {
+        if (transactionType != null && transactionType.isBlank()) {
+            transactionType = null;
+        }
+        return feedWarehouseRepository.findByFilter(feedType, transactionType, startDate, endDate);
+    }
 }
