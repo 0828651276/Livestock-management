@@ -1,26 +1,24 @@
 package com.livestockmanagementapi.model.dto.FeedPlan;
 
-import java.time.LocalDate;
-
 public class FeedPlanRequest {
-    private Long id; // optional: nếu null thì là thêm mới, nếu có thì là cập nhật
+    private Long feedPlanId; // optional: nếu null thì là thêm mới, nếu có thì là cập nhật
     private String feedType;
     private Long dailyFood;
     private Long pigPenId;
 
-    public FeedPlanRequest(Long id, String feedType, Long dailyFood, Long pigPenId) {
-        this.id = id;
+    public FeedPlanRequest(Long feedPlanId, String feedType, Long dailyFood, Long pigPenId) {
+        this.feedPlanId = feedPlanId;
         this.feedType = feedType;
         this.dailyFood = dailyFood;
         this.pigPenId = pigPenId;
     }
 
     public Long getId() {
-        return id;
+        return feedPlanId;
     }
 
     public void setId(Long id) {
-        this.id = id;
+        this.feedPlanId = id;
     }
 
     public String getFeedType() {

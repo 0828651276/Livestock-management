@@ -1,0 +1,12 @@
+package com.livestockmanagementapi.service.medical;
+
+import com.livestockmanagementapi.model.Medical;
+import com.livestockmanagementapi.service.IGenericService;
+import java.util.List;
+
+public interface IMedicalService extends IGenericService<Medical> {
+    /**
+     * Find medical records associated with given animal pigId
+     */
+    List<Medical> findByAnimalId(Long pigId);
+} 

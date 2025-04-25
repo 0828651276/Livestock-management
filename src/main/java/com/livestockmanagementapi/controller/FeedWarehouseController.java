@@ -3,12 +3,16 @@ package com.livestockmanagementapi.controller;
 import com.livestockmanagementapi.model.FeedWarehouse;
 import com.livestockmanagementapi.model.dto.feedWarehouse.FeedRequest;
 import com.livestockmanagementapi.model.dto.feedWarehouse.FeedInventoryDTO;
+import com.livestockmanagementapi.repository.FeedWarehouseRepository;
 import com.livestockmanagementapi.service.feedWarehouse.FeedWarehouseService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -78,5 +82,33 @@ public class FeedWarehouseController {
         return ResponseEntity.ok(feedWarehouseService.searchFeedInventory(keyword));
     }
 
+    @GetMapping("/transactions")
+    public ResponseEntity<List<FeedWarehouse>> getTransactionsByFeedType(@RequestParam("feedType") String feedType) {
+        return ResponseEntity.ok(feedWarehouseService.getTransactionsByFeedType(feedType));
+    }
+
+
+    @GetMapping("/filter")
+    public ResponseEntity<List<FeedWarehouse>> filterTransactions(
+            @RequestParam(required = false) String feedType,
+            @RequestParam(required = false) FeedWarehouse.TransactionType transactionType,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+    ) {
+        return ResponseEntity.ok(feedWarehouseService.filterTransactions(feedType, transactionType, startDate, endDate));
+    }
+
+    @GetMapping("/{feedType}/transactions")
+    public ResponseEntity<List<FeedWarehouse>> getTransactions(
+            @PathVariable String feedType,
+            @RequestParam(required = false) String transactionType,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+    ) {
+        List<FeedWarehouse> transactions = feedWarehouseService.getTransactionsByFilter(
+                feedType, transactionType, startDate, endDate
+        );
+        return ResponseEntity.ok(transactions);
+    }
 }
 

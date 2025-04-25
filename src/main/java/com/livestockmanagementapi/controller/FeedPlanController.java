@@ -15,7 +15,7 @@ import java.util.Optional;
 @RequestMapping("/api/plan")
 @RequiredArgsConstructor
 @CrossOrigin("*")
-public class FeedFlanController {
+public class FeedPlanController {
 
     private final FeedPlanService feedPlanService;
 
@@ -26,11 +26,12 @@ public class FeedFlanController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateFeedPlan(@PathVariable Long id,
-                                               @RequestBody FeedPlanRequest request) {
-        request.setId(id); // gán id từ URL vào DTO
+    public ResponseEntity<Void> updateFeedPlan(@PathVariable Long id, @RequestBody FeedPlanRequest request) {
+        if (request.getId() == null) {
+            request.setId(id); // Đảm bảo id luôn được gán vào request
+        }
         feedPlanService.saveOrUpdateFeedPlan(request);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().build(); // Trả về OK sau khi cập nhật
     }
 
     @GetMapping("/summary")

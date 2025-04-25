@@ -15,7 +15,6 @@ public class FeedPlan {
 
     private String feedType;           // Loại thức ăn
     private Long dailyFood;   // Lượng ăn mỗi ngày
-    private String unit;              // Đơn vị (kg, g, ...)
 
     @ManyToOne
     @JoinColumn(name = "pen_id")

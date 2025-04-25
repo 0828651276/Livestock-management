@@ -14,10 +14,11 @@ public class Vaccination {//Tiêm phòng
     private Long id;
 
     private LocalDate date;
-    private String penCode;
     private String vaccineType;
-    private String vaccinator;
-    private Integer amount;
     private String note;
+
+    @ManyToOne
+    @JoinColumn(name = "pen_id")
+    private PigPen pen;
 }
 
