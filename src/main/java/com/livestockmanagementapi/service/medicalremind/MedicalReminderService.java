@@ -10,6 +10,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -24,7 +25,8 @@ public class MedicalReminderService {
     @Autowired
     private JavaMailSender mailSender;
 
-    @Scheduled(cron = "0 0 8 * * *") // chạy mỗi ngày lúc 8h sáng
+    @Scheduled(cron = "0 16 16 * * *") // chạy mỗi ngày lúc 16h16
+    @Transactional
     public void sendMedicalReminders() {
         LocalDate tomorrow = LocalDate.now().plusDays(1);
         List<Medical> medicals = medicalRepository.findByTreatmentDate(tomorrow);
