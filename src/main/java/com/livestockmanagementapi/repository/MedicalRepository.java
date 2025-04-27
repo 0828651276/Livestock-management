@@ -16,4 +16,4 @@ public interface MedicalRepository extends JpaRepository<Medical, Long> {
 
     List<Medical> findByTreatmentDate(LocalDate treatmentDate);
 
-} 
+    List<Medical> findByTreatmentDateLessThanEqual(LocalDate date);}
