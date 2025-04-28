@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -93,5 +94,18 @@ public class MedicalController {
         }
         medicalService.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Get medical records before today (history)
+     */
+    @GetMapping("/history")
+    public ResponseEntity<List<Medical>> getHistory() {
+        try {
+            List<Medical> list = medicalService.findByTreatmentDateLessThanEqual(LocalDate.now());
+            return ResponseEntity.ok(list);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 } 
