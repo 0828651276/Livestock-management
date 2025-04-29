@@ -30,8 +30,16 @@ public class Medical {
 
     private String notes;
 
+    @Enumerated(EnumType.STRING)
+    private Status status;
+
     public enum TreatmentMethod {
         INJECTION,
         ORAL
+    }
+    // Thêm enum Status
+    public enum Status {
+        SCHEDULED,
+        COMPLETED
     }
 } 

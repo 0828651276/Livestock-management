@@ -16,4 +16,7 @@ public interface IMedicalService extends IGenericService<Medical> {
     /**
      * Find medical records before a specific date
      */
+
+    List<Medical> findByStatus(Medical.Status status);
+    List<Medical> findByAnimalIdAndStatus(Long pigId, Medical.Status status);
 } 

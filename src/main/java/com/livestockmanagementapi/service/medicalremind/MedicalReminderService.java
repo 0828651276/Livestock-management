@@ -25,7 +25,7 @@ public class MedicalReminderService {
     @Autowired
     private JavaMailSender mailSender;
 
-    @Scheduled(cron = "0 30 17 * * *") // chạy mỗi ngày lúc 17h30
+    @Scheduled(cron = "0 55 8 * * *") // chạy mỗi ngày lúc 17h30
     @Transactional
     public void sendMedicalReminders() {
         LocalDate tomorrow = LocalDate.now().plusDays(1);

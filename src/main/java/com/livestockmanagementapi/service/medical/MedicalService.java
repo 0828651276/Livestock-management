@@ -44,4 +44,14 @@ public class MedicalService implements IMedicalService {
     public List<Medical> findByTreatmentDateLessThanEqual(LocalDate date) {
         return medicalRepository.findByTreatmentDateLessThanEqual(date);
     }
+
+    @Override
+    public List<Medical> findByStatus(Medical.Status status) {
+        return medicalRepository.findByStatus(status);
+    }
+
+    @Override
+    public List<Medical> findByAnimalIdAndStatus(Long pigId, Medical.Status status) {
+        return medicalRepository.findByAnimal_PigIdAndStatus(pigId, status);
+    }
 }

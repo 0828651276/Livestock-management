@@ -9,9 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/medical")
@@ -47,7 +47,7 @@ public class MedicalController {
     public ResponseEntity<Medical> getById(@PathVariable Long id) {
         Optional<Medical> med = medicalService.findById(id);
         return med.map(ResponseEntity::ok)
-                  .orElseGet(() -> ResponseEntity.notFound().build());
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     /**
@@ -56,6 +56,9 @@ public class MedicalController {
     @PostMapping
     public ResponseEntity<?> create(@Valid @RequestBody Medical medical) {
         try {
+            if (medical.getStatus() == null) {
+                medical.setStatus(Medical.Status.SCHEDULED);
+            }
             medicalService.save(medical);
             return ResponseEntity.status(HttpStatus.CREATED).body(medical);
         } catch (Exception e) {
@@ -79,6 +82,7 @@ public class MedicalController {
         m.setTreatmentMethod(medical.getTreatmentMethod());
         m.setVeterinarian(medical.getVeterinarian());
         m.setNotes(medical.getNotes());
+        m.setStatus(medical.getStatus());
         medicalService.save(m);
         return ResponseEntity.ok(m);
     }
@@ -97,15 +101,18 @@ public class MedicalController {
     }
 
     /**
-     * Get medical records before today (history)
+     * Get medical records by status
      */
-    @GetMapping("/history")
-    public ResponseEntity<List<Medical>> getHistory() {
-        try {
-            List<Medical> list = medicalService.findByTreatmentDateLessThanEqual(LocalDate.now());
-            return ResponseEntity.ok(list);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+    @GetMapping("/status/{status}")
+    public ResponseEntity<List<Medical>> getByStatus(@PathVariable Medical.Status status) {
+        return ResponseEntity.ok(medicalService.findByStatus(status));
+    }
+
+    /**
+     * Get medical records by animal and status
+     */
+    @GetMapping("/animal/{pigId}/status/{status}")
+    public ResponseEntity<List<Medical>> getByAnimalAndStatus(@PathVariable Long pigId, @PathVariable Medical.Status status) {
+        return ResponseEntity.ok(medicalService.findByAnimalIdAndStatus(pigId, status));
     }
 } 
