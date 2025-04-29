@@ -12,13 +12,12 @@ import java.util.List;
 public interface FeedWarehouseRepository extends JpaRepository<FeedWarehouse, Long> {
 
     @Query("SELECT new com.livestockmanagementapi.model.dto.feedWarehouse.FeedInventoryDTO(f.feedType, " +
-            "SUM(CASE WHEN f.transactionType = com.livestockmanagementapi.model.FeedWarehouse.TransactionType.IMPORT THEN f.quantity " +
-            "         WHEN f.transactionType = com.livestockmanagementapi.model.FeedWarehouse.TransactionType.EXPORT THEN -f.quantity ELSE 0 END), " +
-            "f.note) " +
+            "(SUM(CASE WHEN f.transactionType = 'IMPORT' THEN f.quantity ELSE 0 END) - " +
+            " SUM(CASE WHEN f.transactionType = 'EXPORT' THEN f.quantity ELSE 0 END)), " +
+            "NULL) " +
             "FROM FeedWarehouse f " +
-            "GROUP BY f.feedType, f.note")
+            "GROUP BY f.feedType")
     List<FeedInventoryDTO> getFeedInventorySummary();
-
 
     @Query("SELECT new com.livestockmanagementapi.model.dto.feedWarehouse.FeedInventoryDTO(f.feedType, " +
             "SUM(CASE WHEN f.transactionType = com.livestockmanagementapi.model.FeedWarehouse.TransactionType.IMPORT THEN f.quantity " +
