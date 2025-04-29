@@ -1,0 +1,208 @@
+package com.livestockmanagementapi.service.history;
+
+import com.livestockmanagementapi.model.*;
+import com.livestockmanagementapi.model.dto.feedhistory.FeedHistoryDTO;
+import com.livestockmanagementapi.model.dto.feedhistory.FeedHistoryRequest;
+import com.livestockmanagementapi.model.dto.pigpen.PigPenDTO;
+import com.livestockmanagementapi.repository.AnimalRepository;
+import com.livestockmanagementapi.repository.FeedHistoryRepository;
+import com.livestockmanagementapi.repository.FeedPlanRepository;
+import com.livestockmanagementapi.repository.PigPenRepository;
+import com.livestockmanagementapi.security.SecurityUtil;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+public class FeedHistoryServiceImpl implements FeedHistoryService {
+
+    private final FeedHistoryRepository feedHistoryRepository;
+    private final PigPenRepository pigPenRepository;
+    private final AnimalRepository animalRepository;
+    private final FeedPlanRepository feedPlanRepository;
+    private final SecurityUtil securityUtil;
+
+    // Triển khai các phương thức từ IGenericService
+    @Override
+    public List<FeedHistory> findAll() {
+        return feedHistoryRepository.findAll();
+    }
+
+    @Override
+    public Optional<FeedHistory> findById(Long id) {
+        return feedHistoryRepository.findById(id);
+    }
+
+    @Override
+    public void save(FeedHistory feedHistory) {
+        feedHistoryRepository.save(feedHistory);
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        feedHistoryRepository.deleteById(id);
+    }
+
+    // Triển khai các phương thức từ FeedHistoryService
+    @Override
+    public FeedHistoryDTO createFeedHistory(FeedHistoryRequest request) {
+        FeedHistory feedHistory = new FeedHistory();
+        
+        PigPen pigPen = pigPenRepository.findById(request.getPigPenId())
+                .orElseThrow(() -> new EntityNotFoundException("PigPen not found with id: " + request.getPigPenId()));
+        feedHistory.setPigPen(pigPen);
+        
+        if (request.getAnimalId() != null) {
+            Animal animal = animalRepository.findById(request.getAnimalId())
+                    .orElseThrow(() -> new EntityNotFoundException("Animal not found with id: " + request.getAnimalId()));
+            feedHistory.setAnimal(animal);
+        }
+        
+        if (request.getFeedPlanId() != null) {
+            FeedPlan feedPlan = feedPlanRepository.findById(request.getFeedPlanId())
+                    .orElseThrow(() -> new EntityNotFoundException("FeedPlan not found with id: " + request.getFeedPlanId()));
+            feedHistory.setFeedPlan(feedPlan);
+        }
+        
+        feedHistory.setFeedingTime(request.getFeedingTime());
+        feedHistory.setFeedAmount(request.getFeedAmount());
+        feedHistory.setNotes(request.getNotes());
+        
+        // Set the current user as creator
+        Employee currentEmployee = securityUtil.getCurrentEmployee();
+        feedHistory.setCreatedBy(currentEmployee);
+        
+        FeedHistory savedFeedHistory = feedHistoryRepository.save(feedHistory);
+        return mapToDTO(savedFeedHistory);
+    }
+
+    @Override
+    public FeedHistoryDTO updateFeedHistory(Long id, FeedHistoryRequest request) {
+        FeedHistory feedHistory = feedHistoryRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("FeedHistory not found with id: " + id));
+        
+        if (request.getPigPenId() != null) {
+            PigPen pigPen = pigPenRepository.findById(request.getPigPenId())
+                    .orElseThrow(() -> new EntityNotFoundException("PigPen not found with id: " + request.getPigPenId()));
+            feedHistory.setPigPen(pigPen);
+        }
+        
+        if (request.getAnimalId() != null) {
+            Animal animal = animalRepository.findById(request.getAnimalId())
+                    .orElseThrow(() -> new EntityNotFoundException("Animal not found with id: " + request.getAnimalId()));
+            feedHistory.setAnimal(animal);
+        }
+        
+        if (request.getFeedPlanId() != null) {
+            FeedPlan feedPlan = feedPlanRepository.findById(request.getFeedPlanId())
+                    .orElseThrow(() -> new EntityNotFoundException("FeedPlan not found with id: " + request.getFeedPlanId()));
+            feedHistory.setFeedPlan(feedPlan);
+        }
+        
+        if (request.getFeedingTime() != null) {
+            feedHistory.setFeedingTime(request.getFeedingTime());
+        }
+        
+        if (request.getFeedAmount() != null) {
+            feedHistory.setFeedAmount(request.getFeedAmount());
+        }
+        
+        feedHistory.setNotes(request.getNotes());
+        
+        FeedHistory updatedFeedHistory = feedHistoryRepository.save(feedHistory);
+        return mapToDTO(updatedFeedHistory);
+    }
+
+    @Override
+    public void deleteFeedHistory(Long id) {
+        if (!feedHistoryRepository.existsById(id)) {
+            throw new EntityNotFoundException("FeedHistory not found with id: " + id);
+        }
+        feedHistoryRepository.deleteById(id);
+    }
+
+    @Override
+    public FeedHistoryDTO getFeedHistoryById(Long id) {
+        FeedHistory feedHistory = feedHistoryRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("FeedHistory not found with id: " + id));
+        return mapToDTO(feedHistory);
+    }
+
+    @Override
+    public List<FeedHistoryDTO> getAllFeedHistories() {
+        return feedHistoryRepository.findAll().stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<FeedHistoryDTO> getFeedHistoriesByPigPen(PigPen pigPen) {
+        return feedHistoryRepository.findByPigPen(pigPen).stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<FeedHistoryDTO> getFeedHistoriesByPigPenId(Long pigPenId) {
+        return feedHistoryRepository.findByPigPenId(pigPenId).stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<FeedHistoryDTO> getFeedHistoriesByAnimal(Animal animal) {
+        return feedHistoryRepository.findByAnimal(animal).stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<FeedHistoryDTO> getFeedHistoriesByAnimalId(Long animalId) {
+        return feedHistoryRepository.findByAnimalId(animalId).stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<FeedHistoryDTO> getFeedHistoriesByDateRange(LocalDateTime startDate, LocalDateTime endDate) {
+        return feedHistoryRepository.findByFeedingTimeBetween(startDate, endDate).stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<FeedHistoryDTO> getFeedHistoriesByFeedPlanId(Long feedPlanId) {
+        return feedHistoryRepository.findByFeedPlanId(feedPlanId).stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+    
+    private FeedHistoryDTO mapToDTO(FeedHistory feedHistory) {
+        FeedHistoryDTO dto = new FeedHistoryDTO();
+        dto.setId(feedHistory.getId());
+        
+        if (feedHistory.getPigPen() != null) {
+            PigPenDTO pigPenDTO = new PigPenDTO();
+            pigPenDTO.setId(feedHistory.getPigPen().getId());
+            pigPenDTO.setName(feedHistory.getPigPen().getName());
+            pigPenDTO.setCapacity(feedHistory.getPigPen().getCapacity());
+            pigPenDTO.setLocation(feedHistory.getPigPen().getLocation());
+            dto.setPigPen(pigPenDTO);
+        }
+        
+        dto.setAnimal(feedHistory.getAnimal());
+        dto.setFeedPlan(feedHistory.getFeedPlan());
+        dto.setFeedingTime(feedHistory.getFeedingTime());
+        dto.setFeedAmount(feedHistory.getFeedAmount());
+        dto.setNotes(feedHistory.getNotes());
+        dto.setCreatedBy(feedHistory.getCreatedBy());
+        
+        return dto;
+    }
+}
