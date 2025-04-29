@@ -1,5 +1,6 @@
 package com.livestockmanagementapi.service.vaccination;
 
+import com.livestockmanagementapi.model.Medical;
 import com.livestockmanagementapi.model.Vaccination;
 import com.livestockmanagementapi.repository.VaccinationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,7 @@ public class VaccinationService implements IVaccinationService {
 
     @Override
     public List<Vaccination> findAll() {
-        return vaccinationRepository.findAllByOrderByDate();
+        return vaccinationRepository.findAll();
     }
 
     @Override
@@ -39,5 +40,20 @@ public class VaccinationService implements IVaccinationService {
     @Override
     public Vaccination saveVaccination(Vaccination vaccination) {
         return vaccinationRepository.save(vaccination);
+    }
+
+    @Override
+    public List<Vaccination> findByAnimalId(Long pigId) {
+        return vaccinationRepository.findByAnimal_PigId(pigId);
+    }
+
+    @Override
+    public List<Vaccination> findByStatus(Vaccination.Status status) {
+        return vaccinationRepository.findByStatus(status);
+    }
+
+    @Override
+    public List<Vaccination> findByAnimalIdAndStatus(Long pigId, Vaccination.Status status) {
+        return vaccinationRepository.findByAnimal_PigIdAndStatus(pigId, status);
     }
 }
