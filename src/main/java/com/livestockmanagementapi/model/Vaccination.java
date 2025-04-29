@@ -13,12 +13,21 @@ public class Vaccination {//Tiêm phòng
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "pig_id", nullable = false)
+    private Animal animal;
+
     private LocalDate date;
-    private String vaccineType;
+    private String vaccine;
     private String note;
 
-    @ManyToOne
-    @JoinColumn(name = "pen_id")
-    private PigPen pen;
+    @Enumerated(EnumType.STRING)
+    private Status status;
+
+    // Thêm enum Status
+    public enum Status {
+        SCHEDULED,
+        COMPLETED
+    }
 }
 
