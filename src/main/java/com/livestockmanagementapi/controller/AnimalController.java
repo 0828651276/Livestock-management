@@ -368,16 +368,4 @@ public class AnimalController {
         }
     }
 
-    /**
-     * Get all animals with SICK health status
-     */
-    @GetMapping("/sick")
-    public ResponseEntity<?> getSickAnimals() {
-        try {
-            return ResponseEntity.ok(animalService.findByHealthStatus("SICK"));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
-    }
 }

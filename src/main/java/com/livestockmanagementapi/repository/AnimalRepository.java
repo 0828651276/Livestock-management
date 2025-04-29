@@ -1,6 +1,7 @@
 package com.livestockmanagementapi.repository;
 
 import com.livestockmanagementapi.model.Animal;
+import com.livestockmanagementapi.model.PigPen;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -21,4 +22,6 @@ public interface AnimalRepository extends JpaRepository<Animal, Long> {
 
     // Tìm kiếm theo tên chứa chuỗi (không phân biệt hoa thường)
     List<Animal> findByNameContainingIgnoreCase(String name);
+
+    List<Animal> findByPigPenAndRaisingStatus(PigPen pigPen, Animal.RaisingStatus raisingStatus);
 }

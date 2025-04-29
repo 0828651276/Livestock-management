@@ -9,4 +9,5 @@ public class AuthResponse {
     private String token;
     private String employeeId;
     private String role;
+    
 }
