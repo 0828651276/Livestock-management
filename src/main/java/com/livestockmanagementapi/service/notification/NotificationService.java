@@ -6,7 +6,10 @@ import com.livestockmanagementapi.model.Employee;
 import com.livestockmanagementapi.repository.NotificationRepository;
 import com.livestockmanagementapi.repository.NotificationEmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
+import org.springframework.mail.javamail.JavaMailSender;
+
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,6 +20,9 @@ import java.util.Set;
 public class NotificationService implements INotificationService {
     @Autowired
     private NotificationRepository notificationRepository;
+
+    @Autowired
+    private JavaMailSender javaMailSender;
 
     @Autowired
     private NotificationEmployeeRepository notificationEmployeeRepository;

@@ -5,6 +5,7 @@ import com.livestockmanagementapi.model.Employee;
 import com.livestockmanagementapi.model.FeedHistory;
 import com.livestockmanagementapi.model.FeedPlan;
 import com.livestockmanagementapi.model.PigPen;
+import com.livestockmanagementapi.model.dto.feedWarehouse.FeedRequest;
 import com.livestockmanagementapi.model.dto.feedhistory.FeedHistoryDTO;
 import com.livestockmanagementapi.model.dto.feedhistory.FeedHistoryRequest;
 import com.livestockmanagementapi.repository.AnimalRepository;
@@ -12,10 +13,13 @@ import com.livestockmanagementapi.repository.EmployeeRepository;
 import com.livestockmanagementapi.repository.FeedHistoryRepository;
 import com.livestockmanagementapi.repository.FeedPlanRepository;
 import com.livestockmanagementapi.repository.PigPenRepository;
+import com.livestockmanagementapi.service.feedWarehouse.FeedWarehouseService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -29,6 +33,7 @@ public class FeedHistoryServiceImpl implements FeedHistoryService {
     private final AnimalRepository animalRepository;
     private final FeedPlanRepository feedPlanRepository;
     private final EmployeeRepository employeeRepository;
+    private final FeedWarehouseService feedWarehouseService;
 
     @Override
     public void deleteById(Long id) {
@@ -62,6 +67,7 @@ public class FeedHistoryServiceImpl implements FeedHistoryService {
     }
 
     @Override
+    @Transactional
     public FeedHistoryDTO createFeedHistory(FeedHistoryRequest request) {
         log.info("Creating feed history with request: {}", request);
         try {
@@ -77,9 +83,6 @@ public class FeedHistoryServiceImpl implements FeedHistoryService {
             }
             if (request.getDailyFood() == null || request.getDailyFood() <= 0) {
                 throw new IllegalArgumentException("Daily food amount must be positive");
-            }
-            if (request.getCreatedById() == null) {
-                throw new IllegalArgumentException("Employee ID is required");
             }
 
             FeedHistory feedHistory = new FeedHistory();
@@ -104,11 +107,13 @@ public class FeedHistoryServiceImpl implements FeedHistoryService {
                     .orElseThrow(() -> new RuntimeException("FeedPlan not found with id: " + request.getFeedPlanId()));
             feedHistory.setFeedPlan(feedPlan);
             
-            // Set Employee who created the record - handle as String ID
-            log.debug("Finding employee with id: {}", request.getCreatedById());
-            Employee employee = employeeRepository.findById(String.valueOf(request.getCreatedById()))
-                    .orElseThrow(() -> new RuntimeException("Employee not found with id: " + request.getCreatedById()));
-            feedHistory.setCreatedBy(employee);
+            // Set Employee who created the record
+            if (request.getCreatedById() != null) {
+                log.debug("Finding employee with id: {}", request.getCreatedById());
+                Employee employee = employeeRepository.findById(String.valueOf(request.getCreatedById()))
+                        .orElseThrow(() -> new RuntimeException("Employee not found with id: " + request.getCreatedById()));
+                feedHistory.setCreatedBy(employee);
+            }
             
             feedHistory.setFeedingTime(request.getFeedingTime());
             feedHistory.setDailyFood(request.getDailyFood());
@@ -116,6 +121,24 @@ public class FeedHistoryServiceImpl implements FeedHistoryService {
             log.debug("Saving feed history: {}", feedHistory);
             FeedHistory savedHistory = feedHistoryRepository.save(feedHistory);
             log.info("Successfully saved feed history with id: {}", savedHistory.getId());
+
+            // Create feed export request to reduce inventory
+            FeedRequest feedExportRequest = new FeedRequest(
+                feedPlan.getFeedType(),
+                request.getDailyFood(),
+                LocalDate.now(),
+                request.getPigPenId(),
+                "Xuất kho cho ăn - " + pigPen.getName()
+            );
+            
+            // Export feed from warehouse
+            try {
+                feedWarehouseService.exportFeed(feedExportRequest);
+                log.info("Successfully exported feed from warehouse for feeding");
+            } catch (Exception e) {
+                log.error("Failed to export feed from warehouse: {}", e.getMessage());
+                throw new RuntimeException("Failed to update feed inventory: " + e.getMessage());
+            }
             
             return convertToDTO(savedHistory);
         } catch (Exception e) {
