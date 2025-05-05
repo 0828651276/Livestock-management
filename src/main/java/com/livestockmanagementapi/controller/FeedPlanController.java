@@ -53,4 +53,9 @@ public class FeedPlanController {
         return ResponseEntity.ok(plans);
     }
 
+    @GetMapping("/pen/{penId}")
+    public ResponseEntity<List<FeedPlan>> getFeedPlansByPenId(@PathVariable Long penId) {
+        List<FeedPlan> plans = feedPlanService.findByPenId(penId);
+        return ResponseEntity.ok(plans);
+    }
 }
