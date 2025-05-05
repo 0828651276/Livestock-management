@@ -14,6 +14,6 @@ public class FeedHistoryRequest {
     private Long animalId;
     private Long feedPlanId;
     private LocalDateTime feedingTime;
-    private Long feedAmount;
-    private String notes;
+    private Long dailyFood;
+    private Long createdById;
 }

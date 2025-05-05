@@ -1,8 +1,8 @@
 package com.livestockmanagementapi.model.dto.feedhistory;
 
-import com.livestockmanagementapi.model.dto.animal.AnimalDTO;
-import com.livestockmanagementapi.model.dto.employee.EmployeeDTO;
-import com.livestockmanagementapi.model.dto.feedplan.FeedPlanDTO;
+import com.livestockmanagementapi.model.Animal;
+import com.livestockmanagementapi.model.Employee;
+import com.livestockmanagementapi.model.FeedPlan;
 import com.livestockmanagementapi.model.dto.pigpen.PigPenDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,10 +16,8 @@ import java.time.LocalDateTime;
 public class FeedHistoryDTO {
     private Long id;
     private PigPenDTO pigPen;
-    private AnimalDTO animal;
-    private FeedPlanDTO feedPlan;
+    private Animal animal;
+    private FeedPlan feedPlan;
     private LocalDateTime feedingTime;
-    private Long feedAmount;
-    private String notes;
-    private EmployeeDTO createdBy;
+    private Employee createdBy;
 }

@@ -32,6 +32,9 @@ public class FeedHistory {
     private Long dailyFood; // Lượng thức ăn từ FeedPlan
 
     private LocalDateTime feedingTime;
+    
+    private Long feedAmount; // Amount of feed used in grams
+    
     @ManyToOne
     @JoinColumn(name = "created_by")
     private Employee createdBy;

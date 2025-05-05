@@ -15,11 +15,10 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class FeedHistoryDTO {
     private Long id;
-    private PigPenDTO pigPen;
-    private Animal animal;
-    private FeedPlan feedPlan;
+    private String pigPenName;    // Chỉ lấy tên chuồng
+    private String animalName;    // Chỉ lấy tên động vật nếu có
+    private String feedType;      // Lấy loại thức ăn từ FeedPlan
     private LocalDateTime feedingTime;
-    private Long feedAmount;
-    private String notes;
-    private Employee createdBy;
+    private Long dailyFood;
+    private String createdByName; // Tên người tạo
 }
