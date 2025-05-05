@@ -18,5 +18,8 @@ public interface EmployeeRepository extends JpaRepository<Employee, String> {
 
     // Tìm theo cả id và tên gần đúng
     List<Employee> findByEmployeeIdContainingIgnoreCaseAndFullNameContainingIgnoreCase(String id, String name);
+
+    List<Employee> findByRole(String role);
+
 }
 
