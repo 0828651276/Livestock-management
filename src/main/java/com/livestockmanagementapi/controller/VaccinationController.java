@@ -24,9 +24,7 @@ public class VaccinationController {
         return ResponseEntity.ok(vaccinationService.findAll());
     }
 
-    /**
-     * Get records by pigId
-     */
+    //Get records by pigId
     @GetMapping("/animal/{pigId}")
     public ResponseEntity<List<Vaccination>> getByAnimal(@PathVariable Long pigId) {
         try {
@@ -37,9 +35,7 @@ public class VaccinationController {
         }
     }
 
-    /**
-     * Get record by id
-     */
+    //Get record by id
     @GetMapping("/{id}")
     public ResponseEntity<Vaccination> getById(@PathVariable Long id) {
         Optional<Vaccination> vac = vaccinationService.findById(id);
@@ -47,9 +43,7 @@ public class VaccinationController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    /**
-     * Create new vaccination record
-     */
+    //Create new vaccination record
     @PostMapping
     public ResponseEntity<?> create(@Valid @RequestBody Vaccination vaccination) {
         try {
@@ -63,9 +57,7 @@ public class VaccinationController {
         }
     }
 
-    /**
-     * Update existing vaccination record
-     */
+    //Update existing vaccination record
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable Long id,
                                     @Valid @RequestBody Vaccination vaccination) {
@@ -83,9 +75,7 @@ public class VaccinationController {
         return ResponseEntity.ok(v);
     }
 
-    /**
-     * Delete a vaccination record
-     */
+    //Delete a vaccination record
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
         Optional<Vaccination> existing = vaccinationService.findById(id);
@@ -96,17 +86,13 @@ public class VaccinationController {
         return ResponseEntity.noContent().build();
     }
 
-    /**
-     * Get vaccination records by status
-     */
+    //Get vaccination records by status
     @GetMapping("/status/{status}")
     public ResponseEntity<List<Vaccination>> getByStatus(@PathVariable Vaccination.Status status) {
         return ResponseEntity.ok(vaccinationService.findByStatus(status));
     }
 
-    /**
-     * Get vaccination records by animal and status
-     */
+    //Get vaccination records by animal and status
     @GetMapping("/animal/{pigId}/status/{status}")
     public ResponseEntity<List<Vaccination>> getByAnimalAndStatus(@PathVariable Long pigId, @PathVariable Vaccination.Status status) {
         return ResponseEntity.ok(vaccinationService.findByAnimalIdAndStatus(pigId, status));
