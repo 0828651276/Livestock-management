@@ -1,8 +1,15 @@
 package com.livestockmanagementapi.controller;
 
-import com.livestockmanagementapi.model.Employee;
-import com.livestockmanagementapi.model.PigPen;
+import com.livestockmanagementapi.model.*;
+import com.livestockmanagementapi.model.dto.pigpen.PigPenWithAnimalDTO;
+import com.livestockmanagementapi.repository.AnimalRepository;
 import com.livestockmanagementapi.repository.EmployeeRepository;
+import com.livestockmanagementapi.repository.FeedWarehouseRepository;
+import com.livestockmanagementapi.repository.FeedHistoryRepository;
+import com.livestockmanagementapi.repository.FeedPlanRepository;
+import com.livestockmanagementapi.repository.VaccinationRepository;
+import com.livestockmanagementapi.repository.MedicalRepository;
+import com.livestockmanagementapi.repository.NotificationRepository;
 import com.livestockmanagementapi.service.pigpen.IPigPenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -11,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -26,6 +34,27 @@ public class PigPenController {
 
     @Autowired
     private EmployeeRepository employeeRepository;
+
+    @Autowired
+    private AnimalRepository animalRepository;
+
+    @Autowired
+    private FeedWarehouseRepository feedWarehouseRepository;
+
+    @Autowired
+    private FeedHistoryRepository feedHistoryRepository;
+
+    @Autowired
+    private FeedPlanRepository feedPlanRepository;
+
+    @Autowired
+    private VaccinationRepository vaccinationRepository;
+
+    @Autowired
+    private MedicalRepository medicalRepository;
+
+    @Autowired
+    private NotificationRepository notificationRepository;
 
     @GetMapping
     public List<PigPen> getAllPigPens() {
@@ -128,8 +157,41 @@ public class PigPenController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePigPen(@PathVariable Long id) {
-        Optional<PigPen> pigPen = pigPenService.findById(id);
-        if (pigPen.isPresent()) {
+        Optional<PigPen> pigPenOpt = pigPenService.findById(id);
+        if (pigPenOpt.isPresent()) {
+            PigPen pigPen = pigPenOpt.get();
+
+            // Xóa các bản ghi FeedWarehouse liên quan
+            List<FeedWarehouse> warehouses = feedWarehouseRepository.findAll()
+                .stream().filter(fw -> fw.getPigPen() != null && fw.getPigPen().getPenId().equals(id)).toList();
+            feedWarehouseRepository.deleteAll(warehouses);
+
+            // Xóa các bản ghi FeedHistory liên quan
+            List<FeedHistory> histories = feedHistoryRepository.findByPigPenId(id);
+            feedHistoryRepository.deleteAll(histories);
+
+            // Xóa các bản ghi FeedPlan liên quan
+            List<FeedPlan> plans = feedPlanRepository.findByPigPen(pigPen);
+            feedPlanRepository.deleteAll(plans);
+
+            // Xóa các bản ghi Animal liên quan
+            List<Animal> animals = animalRepository.findByPigPen(pigPen);
+            for (Animal animal : animals) {
+                // Xóa các bản ghi vaccination liên quan đến animal
+                vaccinationRepository.deleteAll(vaccinationRepository.findByAnimal_PigId(animal.getPigId()));
+                // Xóa các bản ghi medical liên quan đến animal
+                medicalRepository.deleteAll(medicalRepository.findByAnimal_PigId(animal.getPigId()));
+            }
+            animalRepository.deleteAll(animals);
+
+            // Xóa các bản ghi Notification liên quan đến penId
+            List<Notification> notifications = notificationRepository.findByPigPens_PenId(id);
+            for (Notification notification : notifications) {
+                notification.getPigPens().remove(pigPen);
+                notificationRepository.save(notification);
+            }
+
+            // Xóa chuồng
             pigPenService.deleteById(id);
             return ResponseEntity.noContent().build();
         }
@@ -192,5 +254,19 @@ public class PigPenController {
     @GetMapping("/my-pens")
     public List<PigPen> getMyPigPens(@RequestParam String employeeId) {
         return pigPenService.findByEmployeeId(employeeId);
+    }
+
+    @GetMapping("/with-animal")
+    public List<PigPenWithAnimalDTO> getPigPensWithAnimal() {
+        List<PigPen> pens = pigPenService.findAll();
+        List<PigPenWithAnimalDTO> result = new ArrayList<>();
+        for (PigPen pen : pens) {
+            // Lấy danh sách động vật đang nuôi trong chuồng này
+            List<Animal> animals = animalRepository.findByPigPenAndRaisingStatus(pen, Animal.RaisingStatus.RAISING);
+            String animalNames = animals.isEmpty() ? "Không có động vật" :
+                animals.stream().map(Animal::getName).distinct().reduce((a, b) -> a + ", " + b).orElse("Không có động vật");
+            result.add(new PigPenWithAnimalDTO(pen.getPenId(), pen.getName(), animalNames));
+        }
+        return result;
     }
 }

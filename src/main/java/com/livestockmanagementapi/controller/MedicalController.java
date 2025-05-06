@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
-
 @RestController
 @RequestMapping("/api/medical")
 @CrossOrigin("*")
@@ -46,7 +45,7 @@ public class MedicalController {
     public ResponseEntity<Medical> getById(@PathVariable Long id) {
         Optional<Medical> med = medicalService.findById(id);
         return med.map(ResponseEntity::ok)
-                  .orElseGet(() -> ResponseEntity.notFound().build());
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     /**
@@ -55,6 +54,9 @@ public class MedicalController {
     @PostMapping
     public ResponseEntity<?> create(@Valid @RequestBody Medical medical) {
         try {
+            if (medical.getStatus() == null) {
+                medical.setStatus(Medical.Status.SCHEDULED);
+            }
             medicalService.save(medical);
             return ResponseEntity.status(HttpStatus.CREATED).body(medical);
         } catch (Exception e) {
@@ -78,6 +80,7 @@ public class MedicalController {
         m.setTreatmentMethod(medical.getTreatmentMethod());
         m.setVeterinarian(medical.getVeterinarian());
         m.setNotes(medical.getNotes());
+        m.setStatus(medical.getStatus());
         medicalService.save(m);
         return ResponseEntity.ok(m);
     }
@@ -93,5 +96,21 @@ public class MedicalController {
         }
         medicalService.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Get medical records by status
+     */
+    @GetMapping("/status/{status}")
+    public ResponseEntity<List<Medical>> getByStatus(@PathVariable Medical.Status status) {
+        return ResponseEntity.ok(medicalService.findByStatus(status));
+    }
+
+    /**
+     * Get medical records by animal and status
+     */
+    @GetMapping("/animal/{pigId}/status/{status}")
+    public ResponseEntity<List<Medical>> getByAnimalAndStatus(@PathVariable Long pigId, @PathVariable Medical.Status status) {
+        return ResponseEntity.ok(medicalService.findByAnimalIdAndStatus(pigId, status));
     }
 } 

@@ -53,4 +53,15 @@ public class FeedPlanController {
         return ResponseEntity.ok(plans);
     }
 
+    @GetMapping("/pen/{penId}")
+    public ResponseEntity<List<FeedPlan>> getFeedPlansByPenId(@PathVariable Long penId) {
+        List<FeedPlan> plans = feedPlanService.findByPenId(penId);
+        return ResponseEntity.ok(plans);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteFeedPlan(@PathVariable Long id) {
+        feedPlanService.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
 }

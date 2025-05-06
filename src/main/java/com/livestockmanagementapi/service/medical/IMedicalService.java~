@@ -11,12 +11,8 @@ public interface IMedicalService extends IGenericService<Medical> {
      */
     List<Medical> findByAnimalId(Long pigId);
 
-    List<Medical> findByTreatmentDateLessThanEqual(LocalDate now);
-
     /**
      * Find medical records before a specific date
      */
-
-    List<Medical> findByStatus(Medical.Status status);
-    List<Medical> findByAnimalIdAndStatus(Long pigId, Medical.Status status);
+    List<Medical> findByTreatmentDateBefore(LocalDate date);
 } 

@@ -5,6 +5,7 @@ import com.livestockmanagementapi.repository.MedicalRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,4 +39,19 @@ public class MedicalService implements IMedicalService {
     public List<Medical> findByAnimalId(Long pigId) {
         return medicalRepository.findByAnimal_PigId(pigId);
     }
-} 
+
+    @Override
+    public List<Medical> findByTreatmentDateLessThanEqual(LocalDate date) {
+        return medicalRepository.findByTreatmentDateLessThanEqual(date);
+    }
+
+    @Override
+    public List<Medical> findByStatus(Medical.Status status) {
+        return medicalRepository.findByStatus(status);
+    }
+
+    @Override
+    public List<Medical> findByAnimalIdAndStatus(Long pigId, Medical.Status status) {
+        return medicalRepository.findByAnimal_PigIdAndStatus(pigId, status);
+    }
+}

@@ -20,4 +20,7 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
 
     // Tìm tất cả, sắp xếp giảm dần theo thời gian đăng và ID
     List<Notification> findAllByOrderByPostedAtDescIdDesc();
+
+    // Tìm tất cả notification liên quan đến một penId
+    List<Notification> findByPigPens_PenId(Long penId);
 }

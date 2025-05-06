@@ -64,24 +64,29 @@ public class FeedPlanService implements IFeedPlanService {
         return feedPlanRepository.findByPigPen_NameContainingIgnoreCase(penName);
     }
 
+    public List<FeedPlan> findByPenId(Long penId) {
+        PigPen pen = pigPenRepository.findById(penId)
+                .orElseThrow(() -> new RuntimeException("Pig pen not found"));
+        return feedPlanRepository.findByPigPen(pen);
+    }
 
     @Override
     public List<FeedPlan> findAll() {
-        return List.of();
+        return feedPlanRepository.findAll();
     }
 
     @Override
     public Optional<FeedPlan> findById(Long id) {
-        return Optional.empty();
+        return feedPlanRepository.findById(id);
     }
 
     @Override
     public void save(FeedPlan feedPlan) {
-
+        feedPlanRepository.save(feedPlan);
     }
 
     @Override
     public void deleteById(Long id) {
-
+        feedPlanRepository.deleteById(id);
     }
 }
