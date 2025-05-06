@@ -21,7 +21,7 @@ public class FeedPlan {
     @JoinColumn(name = "pen_id")
     private PigPen pigPen;
 
-    @OneToMany(mappedBy = "feedPlan", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<FeedHistory> feedHistories = new ArrayList<>();
+//    @OneToMany(mappedBy = "feedPlan", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<FeedHistory> feedHistories = new ArrayList<>();
 }
 
