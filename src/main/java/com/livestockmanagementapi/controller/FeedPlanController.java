@@ -58,4 +58,10 @@ public class FeedPlanController {
         List<FeedPlan> plans = feedPlanService.findByPenId(penId);
         return ResponseEntity.ok(plans);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteFeedPlan(@PathVariable Long id) {
+        feedPlanService.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
 }

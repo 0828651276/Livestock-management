@@ -3,7 +3,8 @@ package com.livestockmanagementapi.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Data
@@ -19,5 +20,8 @@ public class FeedPlan {
     @ManyToOne
     @JoinColumn(name = "pen_id")
     private PigPen pigPen;
+
+    @OneToMany(mappedBy = "feedPlan", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FeedHistory> feedHistories = new ArrayList<>();
 }
 
