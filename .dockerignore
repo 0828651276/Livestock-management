@@ -1,4 +1,0 @@
-.git
-.gradle
-build
-!build/libs/*.jar
