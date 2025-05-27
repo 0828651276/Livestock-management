@@ -9,7 +9,6 @@ import com.livestockmanagementapi.repository.FeedHistoryRepository;
 import com.livestockmanagementapi.repository.FeedPlanRepository;
 import com.livestockmanagementapi.repository.VaccinationRepository;
 import com.livestockmanagementapi.repository.MedicalRepository;
-import com.livestockmanagementapi.repository.NotificationRepository;
 import com.livestockmanagementapi.service.pigpen.IPigPenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
