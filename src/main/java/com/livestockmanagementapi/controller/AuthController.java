@@ -3,7 +3,6 @@ package com.livestockmanagementapi.controller;
 import com.livestockmanagementapi.model.dto.AuthRequest;
 import com.livestockmanagementapi.model.dto.AuthResponse;
 import com.livestockmanagementapi.model.Employee;
-import com.livestockmanagementapi.repository.EmployeeRepository;
 import com.livestockmanagementapi.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;

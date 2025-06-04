@@ -1,7 +1,6 @@
 package com.livestockmanagementapi.security;
 
 import com.livestockmanagementapi.model.Employee;
-import com.livestockmanagementapi.repository.EmployeeRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
