@@ -1,6 +1,7 @@
 package com.livestockmanagementapi.config;
 
 import com.livestockmanagementapi.model.Employee;
+import com.livestockmanagementapi.repository.EmployeeRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
